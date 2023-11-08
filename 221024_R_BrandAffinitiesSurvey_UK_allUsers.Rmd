@@ -1,5 +1,5 @@
 ---
-title: "220930_R_BrandAffinitiesSurvey_UK_StSmUsers_Prelim"
+title: "220930_R_BrandAffinitiesSurvey"
 author: "Alison C. Holland"
 date: "2022-09-30"
 output: html_document
@@ -38,14 +38,14 @@ Get and set working directory
 getwd()
 
 # set working directory
-setwd("/Users/alison/Documents/R_scripts")
+setwd("/Users/xxx")
 getwd()
 ```
 
 Load and organise data
 ```{r}
 # load data
-data <- read_excel("221024_BrandAffinitiesSurvey_UK_allData.xlsx")
+data <- read_excel("data.xlsx")
 
 # rename columns
 names(data) <- c(#brand awareness - general
