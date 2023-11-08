@@ -1,6 +1,5 @@
 # brand-affinities-survey
 Copyright © 2023, Alison C. Holland, All rights reserved.
-${1:Descriptive Statistics & Plotting Likert Scales}
 This script contains code to create bar and radar graphs to visualise and compare different brands and emotional ties around those brands. 
 Data is from a quantitative survey where all questions were closed ended.
 http://rcompanion.org/handbook/E_03.html
