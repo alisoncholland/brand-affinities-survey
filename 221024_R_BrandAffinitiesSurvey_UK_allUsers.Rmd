@@ -1,0 +1,3515 @@
+---
+title: "220930_R_BrandAffinitiesSurvey_UK_StSmUsers_Prelim"
+author: "Alison C. Holland"
+date: "2022-09-30"
+output: html_document
+---
+
+Download and load libraries
+```{r}
+# download libraries
+#install.packages("DBI") # needed for dplyr
+#install.packages("Rcpp") # needed for dplyr
+#install.packages("plyr")
+#install.packages("dplyr")
+#install.packages("tidyr")
+#install.packages("readxl")
+#install.packages("ggplot2")
+#install.packages("fmsb")
+#install.packages("data.table")
+#install.packages("janitor")
+
+# load libraries
+library(DBI) # needed for dplyr
+library(Rcpp) # needed for dplyr
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(ggplot2)
+library(fmsb)
+#library(data.table)
+library(janitor)
+```
+
+Get and set working directory
+```{r}
+# get working directory
+getwd()
+
+# set working directory
+setwd("/Users/alison/Documents/R_scripts")
+getwd()
+```
+
+Load and organise data
+```{r}
+# load data
+data <- read_excel("221024_BrandAffinitiesSurvey_UK_allData.xlsx")
+
+# rename columns
+names(data) <- c(#brand awareness - general
+                 "genBrands_awareness_mcdonalds",
+                 "genBrands_awareness_bereal",
+                 "genBrands_awareness_vinted",
+                 "genBrands_awareness_whatsapp",
+                 "genBrands_awareness_hipal",
+                 "genBrands_awareness_tiktok",
+                 "genBrands_awareness_google",
+                 "genBrands_awareness_disney",
+                 "genBrands_awareness_instagram",
+                 "genBrands_awareness_youtube",
+                 "genBrands_awareness_snapchat",
+                 "genBrands_awareness_facebook",
+                 "genBrands_awareness_spotify",
+                 "genBrands_awareness_messenger",
+                 "genBrands_awareness_telegram",
+                 #brand favourites - general
+                 "genBrands_faves_mcdonalds",
+                 "genBrands_faves_bereal",
+                 "genBrands_faves_vinted",
+                 "genBrands_faves_whatsapp",
+                 "genBrands_faves_hipal",
+                 "genBrands_faves_tiktok",
+                 "genBrands_faves_google",
+                 "genBrands_faves_disney",
+                 "genBrands_faves_instagram",
+                 "genBrands_faves_youtube",
+                 "genBrands_faves_snapchat",
+                 "genBrands_faves_facebook",
+                 "genBrands_faves_spotify",
+                 "genBrands_faves_messenger",
+                 "genBrands_faves_telegram",
+                 #brand familiarity - general
+                 "genBrands_familiar_mcdonalds",
+                 "genBrands_familiar_bereal",
+                 "genBrands_familiar_vinted",
+                 "genBrands_familiar_whatsapp",
+                 "genBrands_familiar_hipal",
+                 "genBrands_familiar_tiktok",
+                 "genBrands_familiar_google",
+                 "genBrands_familiar_disney",
+                 "genBrands_familiar_instagram",
+                 "genBrands_familiar_youtube",
+                 "genBrands_familiar_snapchat",
+                 "genBrands_familiar_facebook",
+                 "genBrands_familiar_spotify",
+                 "genBrands_familiar_messenger",
+                 "genBrands_familiar_telegram",
+                 #emotional ties - general - mcdonalds
+                 "genBrands_emo_mcdonalds_happy",
+                 "genBrands_emo_mcdonalds_satisfied",
+                 "genBrands_emo_mcdonalds_appreciated",
+                 "genBrands_emo_mcdonalds_excited",
+                 "genBrands_emo_mcdonalds_angry",
+                 "genBrands_emo_mcdonalds_stressful",
+                 "genBrands_emo_mcdonalds_disappointed",
+                 "genBrands_emo_mcdonalds_relieved",
+                 "genBrands_emo_mcdonalds_frustrated",
+                 "genBrands_emo_mcdonalds_worried",
+                 "genBrands_emo_mcdonalds_anxious",
+                 "genBrands_emo_mcdonalds_confused",
+                 "genBrands_emo_mcdonalds_confident",
+                 "genBrands_emo_mcdonalds_other",
+                 #emotional ties - general - bereal
+                 "genBrands_emo_bereal_happy",
+                 "genBrands_emo_bereal_satisfied",
+                 "genBrands_emo_bereal_appreciated",
+                 "genBrands_emo_bereal_excited",
+                 "genBrands_emo_bereal_angry",
+                 "genBrands_emo_bereal_stressful",
+                 "genBrands_emo_bereal_disappointed",
+                 "genBrands_emo_bereal_relieved",
+                 "genBrands_emo_bereal_frustrated",
+                 "genBrands_emo_bereal_worried",
+                 "genBrands_emo_bereal_anxious",
+                 "genBrands_emo_bereal_confused",
+                 "genBrands_emo_bereal_confident",
+                 "genBrands_emo_bereal_other",
+                 #emotional ties - general - vinted
+                 "genBrands_emo_vinted_happy",
+                 "genBrands_emo_vinted_satisfied",
+                 "genBrands_emo_vinted_appreciated",
+                 "genBrands_emo_vinted_excited",
+                 "genBrands_emo_vinted_angry",
+                 "genBrands_emo_vinted_stressful",
+                 "genBrands_emo_vinted_disappointed",
+                 "genBrands_emo_vinted_relieved",
+                 "genBrands_emo_vinted_frustrated",
+                 "genBrands_emo_vinted_worried",
+                 "genBrands_emo_vinted_anxious",
+                 "genBrands_emo_vinted_confused",
+                 "genBrands_emo_vinted_confident",
+                 "genBrands_emo_vinted_other",
+                 #emotional ties - general - whatsapp
+                 "genBrands_emo_whatsapp_happy",
+                 "genBrands_emo_whatsapp_satisfied",
+                 "genBrands_emo_whatsapp_appreciated",
+                 "genBrands_emo_whatsapp_excited",
+                 "genBrands_emo_whatsapp_angry",
+                 "genBrands_emo_whatsapp_stressful",
+                 "genBrands_emo_whatsapp_disappointed",
+                 "genBrands_emo_whatsapp_relieved",
+                 "genBrands_emo_whatsapp_frustrated",
+                 "genBrands_emo_whatsapp_worried",
+                 "genBrands_emo_whatsapp_anxious",
+                 "genBrands_emo_whatsapp_confused",
+                 "genBrands_emo_whatsapp_confident",
+                 "genBrands_emo_whatsapp_other",
+                 #emotional ties - general - hipal
+                 "genBrands_emo_hipal_happy",
+                 "genBrands_emo_hipal_satisfied",
+                 "genBrands_emo_hipal_appreciated",
+                 "genBrands_emo_hipal_excited",
+                 "genBrands_emo_hipal_angry",
+                 "genBrands_emo_hipal_stressful",
+                 "genBrands_emo_hipal_disappointed",
+                 "genBrands_emo_hipal_relieved",
+                 "genBrands_emo_hipal_frustrated",
+                 "genBrands_emo_hipal_worried",
+                 "genBrands_emo_hipal_anxious",
+                 "genBrands_emo_hipal_confused",
+                 "genBrands_emo_hipal_confident",
+                 "genBrands_emo_hipal_other",
+                 #emotional ties - general - tiktok
+                 "genBrands_emo_tiktok_happy",
+                 "genBrands_emo_tiktok_satisfied",
+                 "genBrands_emo_tiktok_appreciated",
+                 "genBrands_emo_tiktok_excited",
+                 "genBrands_emo_tiktok_angry",
+                 "genBrands_emo_tiktok_stressful",
+                 "genBrands_emo_tiktok_disappointed",
+                 "genBrands_emo_tiktok_relieved",
+                 "genBrands_emo_tiktok_frustrated",
+                 "genBrands_emo_tiktok_worried",
+                 "genBrands_emo_tiktok_anxious",
+                 "genBrands_emo_tiktok_confused",
+                 "genBrands_emo_tiktok_confident",
+                 "genBrands_emo_tiktok_other",
+                 #emotional ties - general - google
+                 "genBrands_emo_google_happy",
+                 "genBrands_emo_google_satisfied",
+                 "genBrands_emo_google_appreciated",
+                 "genBrands_emo_google_excited",
+                 "genBrands_emo_google_angry",
+                 "genBrands_emo_google_stressful",
+                 "genBrands_emo_google_disappointed",
+                 "genBrands_emo_google_relieved",
+                 "genBrands_emo_google_frustrated",
+                 "genBrands_emo_google_worried",
+                 "genBrands_emo_google_anxious",
+                 "genBrands_emo_google_confused",
+                 "genBrands_emo_google_confident",
+                 "genBrands_emo_google_other",
+                 #emotional ties - general - disney
+                 "genBrands_emo_disney_happy",
+                 "genBrands_emo_disney_satisfied",
+                 "genBrands_emo_disney_appreciated",
+                 "genBrands_emo_disney_excited",
+                 "genBrands_emo_disney_angry",
+                 "genBrands_emo_disney_stressful",
+                 "genBrands_emo_disney_disappointed",
+                 "genBrands_emo_disney_relieved",
+                 "genBrands_emo_disney_frustrated",
+                 "genBrands_emo_disney_worried",
+                 "genBrands_emo_disney_anxious",
+                 "genBrands_emo_disney_confused",
+                 "genBrands_emo_disney_confident",
+                 "genBrands_emo_disney_other",
+                 #emotional ties - general - instagram
+                 "genBrands_emo_instagram_happy",
+                 "genBrands_emo_instagram_satisfied",
+                 "genBrands_emo_instagram_appreciated",
+                 "genBrands_emo_instagram_excited",
+                 "genBrands_emo_instagram_angry",
+                 "genBrands_emo_instagram_stressful",
+                 "genBrands_emo_instagram_disappointed",
+                 "genBrands_emo_instagram_relieved",
+                 "genBrands_emo_instagram_frustrated",
+                 "genBrands_emo_instagram_worried",
+                 "genBrands_emo_instagram_anxious",
+                 "genBrands_emo_instagram_confused",
+                 "genBrands_emo_instagram_confident",
+                 "genBrands_emo_instagram_other",
+                 #emotional ties - general - youtube
+                 "genBrands_emo_youtube_happy",
+                 "genBrands_emo_youtube_satisfied",
+                 "genBrands_emo_youtube_appreciated",
+                 "genBrands_emo_youtube_excited",
+                 "genBrands_emo_youtube_angry",
+                 "genBrands_emo_youtube_stressful",
+                 "genBrands_emo_youtube_disappointed",
+                 "genBrands_emo_youtube_relieved",
+                 "genBrands_emo_youtube_frustrated",
+                 "genBrands_emo_youtube_worried",
+                 "genBrands_emo_youtube_anxious",
+                 "genBrands_emo_youtube_confused",
+                 "genBrands_emo_youtube_confident",
+                 "genBrands_emo_youtube_other",
+                 #emotional ties - general - snapchat
+                 "genBrands_emo_snapchat_happy",
+                 "genBrands_emo_snapchat_satisfied",
+                 "genBrands_emo_snapchat_appreciated",
+                 "genBrands_emo_snapchat_excited",
+                 "genBrands_emo_snapchat_angry",
+                 "genBrands_emo_snapchat_stressful",
+                 "genBrands_emo_snapchat_disappointed",
+                 "genBrands_emo_snapchat_relieved",
+                 "genBrands_emo_snapchat_frustrated",
+                 "genBrands_emo_snapchat_worried",
+                 "genBrands_emo_snapchat_anxious",
+                 "genBrands_emo_snapchat_confused",
+                 "genBrands_emo_snapchat_confident",
+                 "genBrands_emo_snapchat_other",
+                 #emotional ties - general - facebook
+                 "genBrands_emo_facebook_happy",
+                 "genBrands_emo_facebook_satisfied",
+                 "genBrands_emo_facebook_appreciated",
+                 "genBrands_emo_facebook_excited",
+                 "genBrands_emo_facebook_angry",
+                 "genBrands_emo_facebook_stressful",
+                 "genBrands_emo_facebook_disappointed",
+                 "genBrands_emo_facebook_relieved",
+                 "genBrands_emo_facebook_frustrated",
+                 "genBrands_emo_facebook_worried",
+                 "genBrands_emo_facebook_anxious",
+                 "genBrands_emo_facebook_confused",
+                 "genBrands_emo_facebook_confident",
+                 "genBrands_emo_facebook_other",
+                 #emotional ties - general - spotify
+                 "genBrands_emo_spotify_happy",
+                 "genBrands_emo_spotify_satisfied",
+                 "genBrands_emo_spotify_appreciated",
+                 "genBrands_emo_spotify_excited",
+                 "genBrands_emo_spotify_angry",
+                 "genBrands_emo_spotify_stressful",
+                 "genBrands_emo_spotify_disappointed",
+                 "genBrands_emo_spotify_relieved",
+                 "genBrands_emo_spotify_frustrated",
+                 "genBrands_emo_spotify_worried",
+                 "genBrands_emo_spotify_anxious",
+                 "genBrands_emo_spotify_confused",
+                 "genBrands_emo_spotify_confident",
+                 "genBrands_emo_spotify_other",
+                 #emotional ties - general - messenger
+                 "genBrands_emo_messenger_happy",
+                 "genBrands_emo_messenger_satisfied",
+                 "genBrands_emo_messenger_appreciated",
+                 "genBrands_emo_messenger_excited",
+                 "genBrands_emo_messenger_angry",
+                 "genBrands_emo_messenger_stressful",
+                 "genBrands_emo_messenger_disappointed",
+                 "genBrands_emo_messenger_relieved",
+                 "genBrands_emo_messenger_frustrated",
+                 "genBrands_emo_messenger_worried",
+                 "genBrands_emo_messenger_anxious",
+                 "genBrands_emo_messenger_confused",
+                 "genBrands_emo_messenger_confident",
+                 "genBrands_emo_messenger_other",
+                 #emotional ties - general - telegram
+                 "genBrands_emo_telegram_happy",
+                 "genBrands_emo_telegram_satisfied",
+                 "genBrands_emo_telegram_appreciated",
+                 "genBrands_emo_telegram_excited",
+                 "genBrands_emo_telegram_angry",
+                 "genBrands_emo_telegram_stressful",
+                 "genBrands_emo_telegram_disappointed",
+                 "genBrands_emo_telegram_relieved",
+                 "genBrands_emo_telegram_frustrated",
+                 "genBrands_emo_telegram_worried",
+                 "genBrands_emo_telegram_anxious",
+                 "genBrands_emo_telegram_confused",
+                 "genBrands_emo_telegram_confident",
+                 "genBrands_emo_telegram_other",
+                 #brand awareness - EdTech
+                 "edBrands_awareness_quizlet",
+                 "edBrands_awareness_repetico",
+                 "edBrands_awareness_brainyoo",
+                 "edBrands_awareness_studysmarter",
+                 "edBrands_awareness_charlyEd",
+                 "edBrands_awareness_foxit",
+                 "edBrands_awareness_forest",
+                 "edBrands_awareness_goconqr",
+                 "edBrands_awareness_evernote",
+                 "edBrands_awareness_notability",
+                 "edBrands_awareness_goodnotes",
+                 "edBrands_awareness_studydrive",
+                 "edBrands_awareness_coursehero",
+                 "edBrands_awareness_studocu",
+                 "edBrands_awareness_duolingo",
+                 "edBrands_awareness_none",
+                 #brand favourites - EdTech
+                 "edBrands_faves_quizlet",
+                 "edBrands_faves_repetico",
+                 "edBrands_faves_brainyoo",
+                 "edBrands_faves_studysmarter",
+                 "edBrands_faves_charlyEd",
+                 "edBrands_faves_foxit",
+                 "edBrands_faves_forest",
+                 "edBrands_faves_goconqr",
+                 "edBrands_faves_evernote",
+                 "edBrands_faves_notability",
+                 "edBrands_faves_goodnotes",
+                 "edBrands_faves_studydrive",
+                 "edBrands_faves_coursehero",
+                 "edBrands_faves_studocu",
+                 "edBrands_faves_duolingo",
+                 #brand familiarity - EdTech
+                 "edBrands_familiar_quizlet",
+                 "edBrands_familiar_repetico",
+                 "edBrands_familiar_brainyoo",
+                 "edBrands_familiar_studysmarter",
+                 "edBrands_familiar_charlyEd",
+                 "edBrands_familiar_foxit",
+                 "edBrands_familiar_forest",
+                 "edBrands_familiar_goconqr",
+                 "edBrands_familiar_evernote",
+                 "edBrands_familiar_notability",
+                 "edBrands_familiar_goodnotes",
+                 "edBrands_familiar_studydrive",
+                 "edBrands_familiar_coursehero",
+                 "edBrands_familiar_studocu",
+                 "edBrands_familiar_duolingo",
+                 #emotional ties - EdTech - quizlet
+                 "edBrands_emo_quizlet_happy",
+                 "edBrands_emo_quizlet_satisfied",
+                 "edBrands_emo_quizlet_appreciated",
+                 "edBrands_emo_quizlet_excited",
+                 "edBrands_emo_quizlet_angry",
+                 "edBrands_emo_quizlet_stressful",
+                 "edBrands_emo_quizlet_disappointed",
+                 "edBrands_emo_quizlet_relieved",
+                 "edBrands_emo_quizlet_frustrated",
+                 "edBrands_emo_quizlet_worried",
+                 "edBrands_emo_quizlet_anxious",
+                 "edBrands_emo_quizlet_confused",
+                 "edBrands_emo_quizlet_confident",
+                 "edBrands_emo_quizlet_other",
+                 #emotional ties - EdTech - repetico
+                 "edBrands_emo_repetico_happy",
+                 "edBrands_emo_repetico_satisfied",
+                 "edBrands_emo_repetico_appreciated",
+                 "edBrands_emo_repetico_excited",
+                 "edBrands_emo_repetico_angry",
+                 "edBrands_emo_repetico_stressful",
+                 "edBrands_emo_repetico_disappointed",
+                 "edBrands_emo_repetico_relieved",
+                 "edBrands_emo_repetico_frustrated",
+                 "edBrands_emo_repetico_worried",
+                 "edBrands_emo_repetico_anxious",
+                 "edBrands_emo_repetico_confused",
+                 "edBrands_emo_repetico_confident",
+                 "edBrands_emo_repetico_other",
+                 #emotional ties - EdTech - brainyoo
+                 "edBrands_emo_brainyoo_happy",
+                 "edBrands_emo_brainyoo_satisfied",
+                 "edBrands_emo_brainyoo_appreciated",
+                 "edBrands_emo_brainyoo_excited",
+                 "edBrands_emo_brainyoo_angry",
+                 "edBrands_emo_brainyoo_stressful",
+                 "edBrands_emo_brainyoo_disappointed",
+                 "edBrands_emo_brainyoo_relieved",
+                 "edBrands_emo_brainyoo_frustrated",
+                 "edBrands_emo_brainyoo_worried",
+                 "edBrands_emo_brainyoo_anxious",
+                 "edBrands_emo_brainyoo_confused",
+                 "edBrands_emo_brainyoo_confident",
+                 "edBrands_emo_brainyoo_other",
+                 #emotional ties - EdTech - studysmarter
+                 "edBrands_emo_studysmarter_happy",
+                 "edBrands_emo_studysmarter_satisfied",
+                 "edBrands_emo_studysmarter_appreciated",
+                 "edBrands_emo_studysmarter_excited",
+                 "edBrands_emo_studysmarter_angry",
+                 "edBrands_emo_studysmarter_stressful",
+                 "edBrands_emo_studysmarter_disappointed",
+                 "edBrands_emo_studysmarter_relieved",
+                 "edBrands_emo_studysmarter_frustrated",
+                 "edBrands_emo_studysmarter_worried",
+                 "edBrands_emo_studysmarter_anxious",
+                 "edBrands_emo_studysmarter_confused",
+                 "edBrands_emo_studysmarter_confident",
+                 "edBrands_emo_studysmarter_other",
+                 #emotional ties - EdTech - charlyEd
+                 "edBrands_emo_charlyEd_happy",
+                 "edBrands_emo_charlyEd_satisfied",
+                 "edBrands_emo_charlyEd_appreciated",
+                 "edBrands_emo_charlyEd_excited",
+                 "edBrands_emo_charlyEd_angry",
+                 "edBrands_emo_charlyEd_stressful",
+                 "edBrands_emo_charlyEd_disappointed",
+                 "edBrands_emo_charlyEd_relieved",
+                 "edBrands_emo_charlyEd_frustrated",
+                 "edBrands_emo_charlyEd_worried",
+                 "edBrands_emo_charlyEd_anxious",
+                 "edBrands_emo_charlyEd_confused",
+                 "edBrands_emo_charlyEd_confident",
+                 "edBrands_emo_charlyEd_other",
+                 #emotional ties - EdTech - foxit
+                 "edBrands_emo_foxit_happy",
+                 "edBrands_emo_foxit_satisfied",
+                 "edBrands_emo_foxit_appreciated",
+                 "edBrands_emo_foxit_excited",
+                 "edBrands_emo_foxit_angry",
+                 "edBrands_emo_foxit_stressful",
+                 "edBrands_emo_foxit_disappointed",
+                 "edBrands_emo_foxit_relieved",
+                 "edBrands_emo_foxit_frustrated",
+                 "edBrands_emo_foxit_worried",
+                 "edBrands_emo_foxit_anxious",
+                 "edBrands_emo_foxit_confused",
+                 "edBrands_emo_foxit_confident",
+                 "edBrands_emo_foxit_other",
+                 #emotional ties - EdTech - forest
+                 "edBrands_emo_forest_happy",
+                 "edBrands_emo_forest_satisfied",
+                 "edBrands_emo_forest_appreciated",
+                 "edBrands_emo_forest_excited",
+                 "edBrands_emo_forest_angry",
+                 "edBrands_emo_forest_stressful",
+                 "edBrands_emo_forest_disappointed",
+                 "edBrands_emo_forest_relieved",
+                 "edBrands_emo_forest_frustrated",
+                 "edBrands_emo_forest_worried",
+                 "edBrands_emo_forest_anxious",
+                 "edBrands_emo_forest_confused",
+                 "edBrands_emo_forest_confident",
+                 "edBrands_emo_forest_other",
+                 #emotional ties - EdTech - goconqr
+                 "edBrands_emo_goconqr_happy",
+                 "edBrands_emo_goconqr_satisfied",
+                 "edBrands_emo_goconqr_appreciated",
+                 "edBrands_emo_goconqr_excited",
+                 "edBrands_emo_goconqr_angry",
+                 "edBrands_emo_goconqr_stressful",
+                 "edBrands_emo_goconqr_disappointed",
+                 "edBrands_emo_goconqr_relieved",
+                 "edBrands_emo_goconqr_frustrated",
+                 "edBrands_emo_goconqr_worried",
+                 "edBrands_emo_goconqr_anxious",
+                 "edBrands_emo_goconqr_confused",
+                 "edBrands_emo_goconqr_confident",
+                 "edBrands_emo_goconqr_other",
+                 #emotional ties - EdTech - evernote
+                 "edBrands_emo_evernote_happy",
+                 "edBrands_emo_evernote_satisfied",
+                 "edBrands_emo_evernote_appreciated",
+                 "edBrands_emo_evernote_excited",
+                 "edBrands_emo_evernote_angry",
+                 "edBrands_emo_evernote_stressful",
+                 "edBrands_emo_evernote_disappointed",
+                 "edBrands_emo_evernote_relieved",
+                 "edBrands_emo_evernote_frustrated",
+                 "edBrands_emo_evernote_worried",
+                 "edBrands_emo_evernote_anxious",
+                 "edBrands_emo_evernote_confused",
+                 "edBrands_emo_evernote_confident",
+                 "edBrands_emo_evernote_other",
+                 #emotional ties - EdTech - notability
+                 "edBrands_emo_notability_happy",
+                 "edBrands_emo_notability_satisfied",
+                 "edBrands_emo_notability_appreciated",
+                 "edBrands_emo_notability_excited",
+                 "edBrands_emo_notability_angry",
+                 "edBrands_emo_notability_stressful",
+                 "edBrands_emo_notability_disappointed",
+                 "edBrands_emo_notability_relieved",
+                 "edBrands_emo_notability_frustrated",
+                 "edBrands_emo_notability_worried",
+                 "edBrands_emo_notability_anxious",
+                 "edBrands_emo_notability_confused",
+                 "edBrands_emo_notability_confident",
+                 "edBrands_emo_notability_other",
+                 #emotional ties - EdTech - goodnotes
+                 "edBrands_emo_goodnotes_happy",
+                 "edBrands_emo_goodnotes_satisfied",
+                 "edBrands_emo_goodnotes_appreciated",
+                 "edBrands_emo_goodnotes_excited",
+                 "edBrands_emo_goodnotes_angry",
+                 "edBrands_emo_goodnotes_stressful",
+                 "edBrands_emo_goodnotes_disappointed",
+                 "edBrands_emo_goodnotes_relieved",
+                 "edBrands_emo_goodnotes_frustrated",
+                 "edBrands_emo_goodnotes_worried",
+                 "edBrands_emo_goodnotes_anxious",
+                 "edBrands_emo_goodnotes_confused",
+                 "edBrands_emo_goodnotes_confident",
+                 "edBrands_emo_goodnotes_other",
+                 #emotional ties - EdTech - studydrive
+                 "edBrands_emo_studydrive_happy",
+                 "edBrands_emo_studydrive_satisfied",
+                 "edBrands_emo_studydrive_appreciated",
+                 "edBrands_emo_studydrive_excited",
+                 "edBrands_emo_studydrive_angry",
+                 "edBrands_emo_studydrive_stressful",
+                 "edBrands_emo_studydrive_disappointed",
+                 "edBrands_emo_studydrive_relieved",
+                 "edBrands_emo_studydrive_frustrated",
+                 "edBrands_emo_studydrive_worried",
+                 "edBrands_emo_studydrive_anxious",
+                 "edBrands_emo_studydrive_confused",
+                 "edBrands_emo_studydrive_confident",
+                 "edBrands_emo_studydrive_other",
+                 #emotional ties - EdTech - coursehero
+                 "edBrands_emo_coursehero_happy",
+                 "edBrands_emo_coursehero_satisfied",
+                 "edBrands_emo_coursehero_appreciated",
+                 "edBrands_emo_coursehero_excited",
+                 "edBrands_emo_coursehero_angry",
+                 "edBrands_emo_coursehero_stressful",
+                 "edBrands_emo_coursehero_disappointed",
+                 "edBrands_emo_coursehero_relieved",
+                 "edBrands_emo_coursehero_frustrated",
+                 "edBrands_emo_coursehero_worried",
+                 "edBrands_emo_coursehero_anxious",
+                 "edBrands_emo_coursehero_confused",
+                 "edBrands_emo_coursehero_confident",
+                 "edBrands_emo_coursehero_other",
+                 #emotional ties - EdTech - studocu
+                 "edBrands_emo_studocu_happy",
+                 "edBrands_emo_studocu_satisfied",
+                 "edBrands_emo_studocu_appreciated",
+                 "edBrands_emo_studocu_excited",
+                 "edBrands_emo_studocu_angry",
+                 "edBrands_emo_studocu_stressful",
+                 "edBrands_emo_studocu_disappointed",
+                 "edBrands_emo_studocu_relieved",
+                 "edBrands_emo_studocu_frustrated",
+                 "edBrands_emo_studocu_worried",
+                 "edBrands_emo_studocu_anxious",
+                 "edBrands_emo_studocu_confused",
+                 "edBrands_emo_studocu_confident",
+                 "edBrands_emo_studocu_other",
+                 #emotional ties - EdTech - duolingo
+                 "edBrands_emo_duolingo_happy",
+                 "edBrands_emo_duolingo_satisfied",
+                 "edBrands_emo_duolingo_appreciated",
+                 "edBrands_emo_duolingo_excited",
+                 "edBrands_emo_duolingo_angry",
+                 "edBrands_emo_duolingo_stressful",
+                 "edBrands_emo_duolingo_disappointed",
+                 "edBrands_emo_duolingo_relieved",
+                 "edBrands_emo_duolingo_frustrated",
+                 "edBrands_emo_duolingo_worried",
+                 "edBrands_emo_duolingo_anxious",
+                 "edBrands_emo_duolingo_confused",
+                 "edBrands_emo_duolingo_confident",
+                 "edBrands_emo_duolingo_other",
+                 #demographics
+                 "exams",
+                 "country",
+                 "age",
+                 "subjectStudying",
+                 "users")
+
+# remove top row
+data <- data[-c(1), ]
+
+# add in ID column
+data$ID <- seq.int(nrow(data))
+
+# move ID column to first column
+data <- data %>%
+  select(ID, everything())
+
+```
+
+Write out data as .csv to view all columns
+```{r}
+#write.csv(data, "/Users/alison/Documents/R_scripts/_data/data_columnsCheck.csv")
+```
+
+What are the most popular EdTech brands?
+- Brand awareness and favourites - EdTech graph
+```{r}
+# select columns
+data_edtech_brandAwareness <- data %>%
+  dplyr::select(ID,
+                edBrands_awareness_quizlet,
+                edBrands_awareness_repetico,
+                edBrands_awareness_brainyoo,
+                edBrands_awareness_studysmarter,
+                edBrands_awareness_charlyEd,
+                edBrands_awareness_foxit,
+                edBrands_awareness_forest,
+                edBrands_awareness_goconqr,
+                edBrands_awareness_evernote,
+                edBrands_awareness_notability,
+                edBrands_awareness_goodnotes,
+                edBrands_awareness_studydrive,
+                edBrands_awareness_coursehero,
+                edBrands_awareness_studocu,
+                edBrands_awareness_duolingo) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# add column to distinguish awareness vs. faves
+data_edtech_brandAwareness$question <- "awareness"
+
+# remove "edBrands_awareness_" from row names
+data_edtech_brandAwareness <- data_edtech_brandAwareness %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "edBrands_awareness_")))
+
+# select columns
+data_edtech_brandFaves <- data %>%
+  dplyr::select(ID,
+                edBrands_faves_quizlet,
+                edBrands_faves_repetico,
+                edBrands_faves_brainyoo,
+                edBrands_faves_studysmarter,
+                edBrands_faves_charlyEd,
+                edBrands_faves_foxit,
+                edBrands_faves_forest,
+                edBrands_faves_goconqr,
+                edBrands_faves_evernote,
+                edBrands_faves_notability,
+                edBrands_faves_goodnotes,
+                edBrands_faves_studydrive,
+                edBrands_faves_coursehero,
+                edBrands_faves_studocu,
+                edBrands_faves_duolingo)  %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# add column to distinguish awareness vs. faves
+data_edtech_brandFaves$question <- "favourites"
+
+# remove "edBrands_faves_" from row names
+data_edtech_brandFaves <- data_edtech_brandFaves %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "edBrands_faves_")))
+
+# bind brand awareness and faves dfs
+data_edtech_brandAwarenessFaves <- dplyr::bind_rows(data_edtech_brandAwareness, 
+                                                     data_edtech_brandFaves)
+
+# change "count" column to numeric
+data_edtech_brandAwarenessFaves$count <- as.numeric(data_edtech_brandAwarenessFaves$count)
+
+# plot stacked bar graph
+ggplot(data_edtech_brandAwarenessFaves, 
+       aes(x = reorder(brand, count),
+           y = count,
+           fill = factor(question, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+  # change fill title to "question"
+  labs(fill = "question") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  ggtitle("What are the most popular EdTech brands?") +
+  # change x-axis title
+  xlab("brand")
+
+```
+
+What are the most popular non-EdTech brands?
+- Brand awareness and favourites - general graph
+```{r}
+# select columns
+data_general_brandAwareness <- data %>%
+  dplyr::select(ID,
+                genBrands_awareness_mcdonalds,
+                genBrands_awareness_bereal,
+                genBrands_awareness_vinted,
+                genBrands_awareness_whatsapp,
+                genBrands_awareness_hipal,
+                genBrands_awareness_tiktok,
+                genBrands_awareness_google,
+                genBrands_awareness_disney,
+                genBrands_awareness_instagram,
+                genBrands_awareness_youtube,
+                genBrands_awareness_snapchat,
+                genBrands_awareness_facebook,
+                genBrands_awareness_spotify,
+                genBrands_awareness_messenger,
+                genBrands_awareness_telegram) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# add column to distinguish awareness vs. faves
+data_general_brandAwareness$question <- "awareness"
+
+# remove "genBrands_awareness_" from row names
+data_general_brandAwareness <- data_general_brandAwareness %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "genBrands_awareness_")))
+
+# select columns
+data_general_brandFaves <- data %>%
+  dplyr::select(ID,
+                genBrands_faves_mcdonalds,
+                genBrands_faves_bereal,
+                genBrands_faves_vinted,
+                genBrands_faves_whatsapp,
+                genBrands_faves_hipal,
+                genBrands_faves_tiktok,
+                genBrands_faves_google,
+                genBrands_faves_disney,
+                genBrands_faves_instagram,
+                genBrands_faves_youtube,
+                genBrands_faves_snapchat,
+                genBrands_faves_facebook,
+                genBrands_faves_spotify,
+                genBrands_faves_messenger,
+                genBrands_faves_telegram)  %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# add column to distinguish awareness vs. faves
+data_general_brandFaves$question <- "favourites"
+
+# remove "genBrands_faves_" from row names
+data_general_brandFaves <- data_general_brandFaves %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "genBrands_faves_")))
+
+# bind brand awareness and faves dfs
+data_general_brandAwarenessFaves <- dplyr::bind_rows(data_general_brandAwareness, 
+                                                     data_general_brandFaves)
+
+# change "count" column to numeric
+data_general_brandAwarenessFaves$count <- as.numeric(data_general_brandAwarenessFaves$count)
+
+# plot stacked bar graph
+ggplot(data_general_brandAwarenessFaves, 
+       aes(x = reorder(brand, count),
+           y = count,
+           fill = factor(question, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+  # change fill title to "question"
+  labs(fill = "question") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  ggtitle("What are the most popular non-EdTech brands?") +
+  # change x-axis title
+  xlab("brand")
+
+```
+
+Of the EdTech brands that are most popular, what kind of descriptive words or emotions are associated with them?
+- positive
+```{r}
+# brand1
+# select columns
+data_edTech_emos_pos_brand1 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_quizlet_happy,
+                edBrands_emo_quizlet_satisfied,
+                edBrands_emo_quizlet_appreciated,
+                edBrands_emo_quizlet_excited,
+                edBrands_emo_quizlet_relieved,
+                edBrands_emo_quizlet_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand1_count", 2:7)
+
+# change "count" column to numeric
+data_edTech_emos_pos_brand1$brand1_count <- as.numeric(data_edTech_emos_pos_brand1$brand1_count)
+
+# remove ID column
+data_edTech_emos_pos_brand1 <- data_edTech_emos_pos_brand1[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_pos_brand1 <- data_edTech_emos_pos_brand1 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "edBrands_emo_quizlet_")))
+
+# brand2
+# select columns
+data_edTech_emos_pos_brand2 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_duolingo_happy,
+                edBrands_emo_duolingo_satisfied,
+                edBrands_emo_duolingo_appreciated,
+                edBrands_emo_duolingo_excited,
+                edBrands_emo_duolingo_relieved,
+                edBrands_emo_duolingo_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand2_count", 2:7)
+
+# change "count" column to numeric
+data_edTech_emos_pos_brand2$brand2_count <- as.numeric(data_edTech_emos_pos_brand2$brand2_count)
+
+# remove ID column
+data_edTech_emos_pos_brand2 <- data_edTech_emos_pos_brand2[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_pos_brand2 <- data_edTech_emos_pos_brand2 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "edBrands_emo_duolingo_")))
+
+# brand3
+# select columns
+data_edTech_emos_pos_brand3 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_forest_happy,
+                edBrands_emo_forest_satisfied,
+                edBrands_emo_forest_appreciated,
+                edBrands_emo_forest_excited,
+                edBrands_emo_forest_relieved,
+                edBrands_emo_forest_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand3_count", 2:7)
+
+# change "count" column to numeric
+data_edTech_emos_pos_brand3$brand3_count <- as.numeric(data_edTech_emos_pos_brand3$brand3_count)
+
+# remove ID column
+data_edTech_emos_pos_brand3 <- data_edTech_emos_pos_brand3[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_pos_brand3 <- data_edTech_emos_pos_brand3 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "edBrands_emo_forest_")))
+
+# brand4
+# select columns
+data_edTech_emos_pos_brand4 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_evernote_happy,
+                edBrands_emo_evernote_satisfied,
+                edBrands_emo_evernote_appreciated,
+                edBrands_emo_evernote_excited,
+                edBrands_emo_evernote_relieved,
+                edBrands_emo_evernote_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand4_count", 2:7)
+
+# change "count" column to numeric
+data_edTech_emos_pos_brand4$brand4_count <- as.numeric(data_edTech_emos_pos_brand4$brand4_count)
+
+# remove ID column
+data_edTech_emos_pos_brand4 <- data_edTech_emos_pos_brand4[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_pos_brand4 <- data_edTech_emos_pos_brand4 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "edBrands_emo_evernote_")))
+
+# brand5
+# select columns
+data_edTech_emos_pos_brand5 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_goodnotes_happy,
+                edBrands_emo_goodnotes_satisfied,
+                edBrands_emo_goodnotes_appreciated,
+                edBrands_emo_goodnotes_excited,
+                edBrands_emo_goodnotes_relieved,
+                edBrands_emo_goodnotes_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand5_count", 2:7)
+
+# change "count" column to numeric
+data_edTech_emos_pos_brand5$brand5_count <- as.numeric(data_edTech_emos_pos_brand5$brand5_count)
+
+# remove ID column
+data_edTech_emos_pos_brand5 <- data_edTech_emos_pos_brand5[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_pos_brand5 <- data_edTech_emos_pos_brand5 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "edBrands_emo_goodnotes_")))
+
+# join all dfs
+data_edTech_emos_pos <- merge(data_edTech_emos_pos_brand1, data_edTech_emos_pos_brand2, all.x = TRUE)
+data_edTech_emos_pos <- merge(data_edTech_emos_pos, data_edTech_emos_pos_brand3, all.x = TRUE)
+data_edTech_emos_pos <- merge(data_edTech_emos_pos, data_edTech_emos_pos_brand4, all.x = TRUE)
+data_edTech_emos_pos <- merge(data_edTech_emos_pos, data_edTech_emos_pos_brand5, all.x = TRUE)
+
+# prep for single radar graphs
+# check out data for reference
+data_edTech_emos_pos
+
+# set radar graph max, min, interval and individual values
+max <- 40
+min <- 0
+interval <- 10 # divide max into 4 intervals
+
+# create variables
+# brand1
+brand1_appreciated <- c(max, min, as.numeric(data_edTech_emos_pos[1, 2])) 
+brand1_confident <- c(max, min, as.numeric(data_edTech_emos_pos[2, 2]))
+brand1_excited <- c(max, min, as.numeric(data_edTech_emos_pos[3, 2]))
+brand1_happy <- c(max, min, as.numeric(data_edTech_emos_pos[4, 2]))
+brand1_relieved <- c(max, min, as.numeric(data_edTech_emos_pos[5, 2]))
+brand1_satisfied <- c(max, min, as.numeric(data_edTech_emos_pos[6, 2]))
+# brand2
+brand2_appreciated <- c(max, min, as.numeric(data_edTech_emos_pos[1, 3])) 
+brand2_confident <- c(max, min, as.numeric(data_edTech_emos_pos[2, 3]))
+brand2_excited <- c(max, min, as.numeric(data_edTech_emos_pos[3, 3]))
+brand2_happy <- c(max, min, as.numeric(data_edTech_emos_pos[4, 3]))
+brand2_relieved <- c(max, min, as.numeric(data_edTech_emos_pos[5, 3]))
+brand2_satisfied <- c(max, min, as.numeric(data_edTech_emos_pos[6, 3]))
+# brand3
+brand3_appreciated <- c(max, min, as.numeric(data_edTech_emos_pos[1, 4])) 
+brand3_confident <- c(max, min, as.numeric(data_edTech_emos_pos[2, 4]))
+brand3_excited <- c(max, min, as.numeric(data_edTech_emos_pos[3, 4]))
+brand3_happy <- c(max, min, as.numeric(data_edTech_emos_pos[4, 4]))
+brand3_relieved <- c(max, min, as.numeric(data_edTech_emos_pos[5, 4]))
+brand3_satisfied <- c(max, min, as.numeric(data_edTech_emos_pos[6, 4]))
+# brand4
+brand4_appreciated <- c(max, min, as.numeric(data_edTech_emos_pos[1, 5])) 
+brand4_confident <- c(max, min, as.numeric(data_edTech_emos_pos[2, 5]))
+brand4_excited <- c(max, min, as.numeric(data_edTech_emos_pos[3, 5]))
+brand4_happy <- c(max, min, as.numeric(data_edTech_emos_pos[4, 5]))
+brand4_relieved <- c(max, min, as.numeric(data_edTech_emos_pos[5, 5]))
+brand4_satisfied <- c(max, min, as.numeric(data_edTech_emos_pos[6, 5]))
+# brand5
+brand5_appreciated <- c(max, min, as.numeric(data_edTech_emos_pos[1, 6])) 
+brand5_confident <- c(max, min, as.numeric(data_edTech_emos_pos[2, 6]))
+brand5_excited <- c(max, min, as.numeric(data_edTech_emos_pos[3, 6]))
+brand5_happy <- c(max, min, as.numeric(data_edTech_emos_pos[4, 6]))
+brand5_relieved <- c(max, min, as.numeric(data_edTech_emos_pos[5, 6]))
+brand5_satisfied <- c(max, min, as.numeric(data_edTech_emos_pos[6, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+# brand1
+brand1_radar_pos <- list(brand1_appreciated,
+                      brand1_confident,
+                      brand1_excited,
+                      brand1_happy, 
+                      brand1_relieved,
+                      brand1_satisfied)
+brand1_radar_pos <- as.data.frame(cbind(
+                      brand1_appreciated,
+                      brand1_confident,
+                      brand1_excited,
+                      brand1_happy, 
+                      brand1_relieved,
+                      brand1_satisfied))
+brand1_radar_pos
+# brand2
+brand2_radar_pos <- list(brand2_appreciated,
+                      brand2_confident,
+                      brand2_excited,
+                      brand2_happy, 
+                      brand2_relieved,
+                      brand2_satisfied)
+brand2_radar_pos <- as.data.frame(cbind(
+                      brand2_appreciated,
+                      brand2_confident,
+                      brand2_excited,
+                      brand2_happy, 
+                      brand2_relieved,
+                      brand2_satisfied))
+brand2_radar_pos
+# brand3
+brand3_radar_pos <- list(brand3_appreciated,
+                      brand3_confident,
+                      brand3_excited,
+                      brand3_happy, 
+                      brand3_relieved,
+                      brand3_satisfied)
+brand3_radar_pos <- as.data.frame(cbind(
+                      brand3_appreciated,
+                      brand3_confident,
+                      brand3_excited,
+                      brand3_happy, 
+                      brand3_relieved,
+                      brand3_satisfied))
+brand3_radar_pos
+# brand4
+brand4_radar_pos <- list(brand4_appreciated,
+                      brand4_confident,
+                      brand4_excited,
+                      brand4_happy, 
+                      brand4_relieved,
+                      brand4_satisfied)
+brand4_radar_pos <- as.data.frame(cbind(
+                      brand4_appreciated,
+                      brand4_confident,
+                      brand4_excited,
+                      brand4_happy, 
+                      brand4_relieved,
+                      brand4_satisfied))
+brand4_radar_pos
+# brand5
+brand5_radar_pos <- list(brand5_appreciated,
+                      brand5_confident,
+                      brand5_excited,
+                      brand5_happy, 
+                      brand5_relieved,
+                      brand5_satisfied)
+brand5_radar_pos <- as.data.frame(cbind(
+                      brand5_appreciated,
+                      brand5_confident,
+                      brand5_excited,
+                      brand5_happy, 
+                      brand5_relieved,
+                      brand5_satisfied))
+brand5_radar_pos
+
+# plot single ratings radar graphs
+# update column names
+emotions <- c("appreciated",
+              "confident",
+              "excited",
+              "happy",
+              "relieved",
+              "satisfied")
+colnames(brand1_radar_pos) <- c(emotions)
+colnames(brand2_radar_pos) <- c(emotions)
+colnames(brand3_radar_pos) <- c(emotions)
+colnames(brand4_radar_pos) <- c(emotions)
+colnames(brand5_radar_pos) <- c(emotions)
+
+# plot charts
+# brand1
+radarchart(brand1_radar_pos,
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = rgb(0.2, 0.5, 0.5, 0.9), # vector of colour codes for plot data
+           pfcol = rgb(0.2, 0.5, 0.5, 0.5), # vector of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What positive emotions are associated with Quizlet?"
+)
+# brand2
+radarchart(brand2_radar_pos,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.2, 0.5, 0.8, 0.9), 
+           pfcol = rgb(0.2, 0.5, 0.8, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with Duolingo?"
+)          
+# brand3
+radarchart(brand3_radar_pos,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.7, 0.5, 0.1, 0.9), 
+           pfcol = rgb(0.7, 0.5, 0.1, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with Forest?"
+)
+# brand4
+radarchart(brand4_radar_pos, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.8, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.8, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with StudySmarter?"
+)
+# brand5
+radarchart(brand5_radar_pos, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.5, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.5, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with GoodNotes?"
+)
+
+# create variables for multiple ratings radar graphs
+# create variables
+# appreciated
+appreciated <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[1, 2]), 
+  as.numeric(data_edTech_emos_pos[1, 3]), 
+  as.numeric(data_edTech_emos_pos[1, 4]), 
+  as.numeric(data_edTech_emos_pos[1, 5]),
+  as.numeric(data_edTech_emos_pos[1, 6]))
+# confident
+confident <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[2, 2]), 
+  as.numeric(data_edTech_emos_pos[2, 3]), 
+  as.numeric(data_edTech_emos_pos[2, 4]), 
+  as.numeric(data_edTech_emos_pos[2, 5]),
+  as.numeric(data_edTech_emos_pos[2, 6]))
+# excited
+excited <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[3, 2]), 
+  as.numeric(data_edTech_emos_pos[3, 3]), 
+  as.numeric(data_edTech_emos_pos[3, 4]), 
+  as.numeric(data_edTech_emos_pos[3, 5]),
+  as.numeric(data_edTech_emos_pos[3, 6]))
+# happy
+happy <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[4, 2]), 
+  as.numeric(data_edTech_emos_pos[4, 3]), 
+  as.numeric(data_edTech_emos_pos[4, 4]), 
+  as.numeric(data_edTech_emos_pos[4, 5]),
+  as.numeric(data_edTech_emos_pos[4, 6]))
+# relieved
+relieved <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[5, 2]), 
+  as.numeric(data_edTech_emos_pos[5, 3]), 
+  as.numeric(data_edTech_emos_pos[5, 4]), 
+  as.numeric(data_edTech_emos_pos[5, 5]),
+  as.numeric(data_edTech_emos_pos[5, 6]))
+# satisfied
+satisfied <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_pos[6, 2]), 
+  as.numeric(data_edTech_emos_pos[6, 3]), 
+  as.numeric(data_edTech_emos_pos[6, 4]), 
+  as.numeric(data_edTech_emos_pos[6, 5]),
+  as.numeric(data_edTech_emos_pos[6, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+allRadar_pos <- list(
+  appreciated, 
+  confident, 
+  excited, 
+  happy, 
+  relieved, 
+  satisfied) 
+allRadar_pos <- as.data.frame(cbind(
+  appreciated, 
+  confident, 
+  excited, 
+  happy, 
+  relieved, 
+  satisfied))
+allRadar_pos
+
+# pimp out radar chart
+colors_border = c(rgb(0.2, 0.5, 0.5, 0.9), 
+                  rgb(0.2, 0.5, 0.8, 0.9), 
+                  rgb(0.7, 0.5, 0.1, 0.9), 
+                  rgb(0.8, 0.2, 0.5, 0.9),
+                  rgb(0.5, 0.2, 0.5, 0.9)) # vector coded as var
+
+colors_in = c(rgb(0.2, 0.5, 0.5, 0.4), 
+              rgb(0.2, 0.5, 0.8, 0.4), 
+              rgb(0.7, 0.5, 0.1, 0.4), 
+              rgb(0.8, 0.2, 0.5, 0.4),
+              rgb(0.5, 0.2, 0.5, 0.4)) # vector coded as var
+
+radarchart(allRadar_pos,  
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = colors_border, # var of colour codes for plot data
+           pfcol = colors_in, # var of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           plty = 1, # vector of line types for plot data (repeatedly used)
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What positive emotions are associated with the 5 most popular EdTech brands?"
+)
+```
+
+Of the EdTech brands that are most popular, what kind of descriptive words or emotions are associated with them?
+- negative
+```{r}
+# brand1
+# select columns
+data_edTech_emos_neg_brand1 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_quizlet_angry,
+                edBrands_emo_quizlet_stressful,
+                edBrands_emo_quizlet_disappointed,
+                edBrands_emo_quizlet_frustrated,
+                edBrands_emo_quizlet_worried,
+                edBrands_emo_quizlet_anxious,
+                edBrands_emo_quizlet_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand1_count", 2:8)
+
+# change "count" column to numeric
+data_edTech_emos_neg_brand1$brand1_count <- as.numeric(data_edTech_emos_neg_brand1$brand1_count)
+
+# remove ID column
+data_edTech_emos_neg_brand1 <- data_edTech_emos_neg_brand1[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_neg_brand1 <- data_edTech_emos_neg_brand1 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "edBrands_emo_quizlet_")))
+
+# brand2
+# select columns
+data_edTech_emos_neg_brand2 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_duolingo_angry,
+                edBrands_emo_duolingo_stressful,
+                edBrands_emo_duolingo_disappointed,
+                edBrands_emo_duolingo_frustrated,
+                edBrands_emo_duolingo_worried,
+                edBrands_emo_duolingo_anxious,
+                edBrands_emo_duolingo_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand2_count", 2:8)
+
+# change "count" column to numeric
+data_edTech_emos_neg_brand2$brand2_count <- as.numeric(data_edTech_emos_neg_brand2$brand2_count)
+
+# remove ID column
+data_edTech_emos_neg_brand2 <- data_edTech_emos_neg_brand2[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_neg_brand2 <- data_edTech_emos_neg_brand2 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "edBrands_emo_duolingo_")))
+
+# brand3
+# select columns
+data_edTech_emos_neg_brand3 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_forest_angry,
+                edBrands_emo_forest_stressful,
+                edBrands_emo_forest_disappointed,
+                edBrands_emo_forest_frustrated,
+                edBrands_emo_forest_worried,
+                edBrands_emo_forest_anxious,
+                edBrands_emo_forest_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand3_count", 2:8)
+
+# change "count" column to numeric
+data_edTech_emos_neg_brand3$brand3_count <- as.numeric(data_edTech_emos_neg_brand3$brand3_count)
+
+# remove ID column
+data_edTech_emos_neg_brand3 <- data_edTech_emos_neg_brand3[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_neg_brand3 <- data_edTech_emos_neg_brand3 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "edBrands_emo_forest_")))
+
+# brand4
+# select columns
+data_edTech_emos_neg_brand4 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_evernote_angry,
+                edBrands_emo_evernote_stressful,
+                edBrands_emo_evernote_disappointed,
+                edBrands_emo_evernote_frustrated,
+                edBrands_emo_evernote_worried,
+                edBrands_emo_evernote_anxious,
+                edBrands_emo_evernote_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand4_count", 2:8)
+
+# change "count" column to numeric
+data_edTech_emos_neg_brand4$brand4_count <- as.numeric(data_edTech_emos_neg_brand4$brand4_count)
+
+# remove ID column
+data_edTech_emos_neg_brand4 <- data_edTech_emos_neg_brand4[, -c(1)]
+
+# remove "edBrands_emo_studysmarter_" from row names
+data_edTech_emos_neg_brand4 <- data_edTech_emos_neg_brand4 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "edBrands_emo_evernote_")))
+
+# brand5
+# select columns
+data_edTech_emos_neg_brand5 <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_goodnotes_angry,
+                edBrands_emo_goodnotes_stressful,
+                edBrands_emo_goodnotes_disappointed,
+                edBrands_emo_goodnotes_frustrated,
+                edBrands_emo_goodnotes_worried,
+                edBrands_emo_goodnotes_anxious,
+                edBrands_emo_goodnotes_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand5_count", 2:8)
+
+# change "count" column to numeric
+data_edTech_emos_neg_brand5$brand5_count <- as.numeric(data_edTech_emos_neg_brand5$brand5_count)
+
+# remove ID column
+data_edTech_emos_neg_brand5 <- data_edTech_emos_neg_brand5[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_edTech_emos_neg_brand5 <- data_edTech_emos_neg_brand5 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "edBrands_emo_goodnotes_")))
+
+# join all dfs
+data_edTech_emos_neg <- merge(data_edTech_emos_neg_brand1, data_edTech_emos_neg_brand2, all.x = TRUE)
+data_edTech_emos_neg <- merge(data_edTech_emos_neg, data_edTech_emos_neg_brand3, all.x = TRUE)
+data_edTech_emos_neg <- merge(data_edTech_emos_neg, data_edTech_emos_neg_brand4, all.x = TRUE)
+data_edTech_emos_neg <- merge(data_edTech_emos_neg, data_edTech_emos_neg_brand5, all.x = TRUE)
+
+# radar graphs
+# check out data for reference
+data_edTech_emos_neg
+
+# set radar graph max, min, interval and individual values
+max <- 20
+min <- 0
+interval <- 5 # divide max into 4 intervals
+
+# create variables
+# brand1
+brand1_angry <- c(max, min, as.numeric(data_edTech_emos_neg[1, 2])) 
+brand1_anxious <- c(max, min, as.numeric(data_edTech_emos_neg[2, 2]))
+brand1_confused <- c(max, min, as.numeric(data_edTech_emos_neg[3, 2]))
+brand1_disappointed <- c(max, min, as.numeric(data_edTech_emos_neg[4, 2]))
+brand1_frustrated <- c(max, min, as.numeric(data_edTech_emos_neg[5, 2]))
+brand1_stressful <- c(max, min, as.numeric(data_edTech_emos_neg[6, 2]))
+brand1_worried <- c(max, min, as.numeric(data_edTech_emos_neg[7, 2]))
+# brand2
+brand2_angry <- c(max, min, as.numeric(data_edTech_emos_neg[1, 3])) 
+brand2_anxious <- c(max, min, as.numeric(data_edTech_emos_neg[2, 3]))
+brand2_confused <- c(max, min, as.numeric(data_edTech_emos_neg[3, 3]))
+brand2_disappointed <- c(max, min, as.numeric(data_edTech_emos_neg[4, 3]))
+brand2_frustrated <- c(max, min, as.numeric(data_edTech_emos_neg[5, 3]))
+brand2_stressful <- c(max, min, as.numeric(data_edTech_emos_neg[6, 3]))
+brand2_worried <- c(max, min, as.numeric(data_edTech_emos_neg[7, 3]))
+# brand3
+brand3_angry <- c(max, min, as.numeric(data_edTech_emos_neg[1, 4])) 
+brand3_anxious <- c(max, min, as.numeric(data_edTech_emos_neg[2, 4]))
+brand3_confused <- c(max, min, as.numeric(data_edTech_emos_neg[3, 4]))
+brand3_disappointed <- c(max, min, as.numeric(data_edTech_emos_neg[4, 4]))
+brand3_frustrated <- c(max, min, as.numeric(data_edTech_emos_neg[5, 4]))
+brand3_stressful <- c(max, min, as.numeric(data_edTech_emos_neg[6, 4]))
+brand3_worried <- c(max, min, as.numeric(data_edTech_emos_neg[7, 4]))
+# brand4
+brand4_angry <- c(max, min, as.numeric(data_edTech_emos_neg[1, 5])) 
+brand4_anxious <- c(max, min, as.numeric(data_edTech_emos_neg[2, 5]))
+brand4_confused <- c(max, min, as.numeric(data_edTech_emos_neg[3, 5]))
+brand4_disappointed <- c(max, min, as.numeric(data_edTech_emos_neg[4, 5]))
+brand4_frustrated <- c(max, min, as.numeric(data_edTech_emos_neg[5, 5]))
+brand4_stressful <- c(max, min, as.numeric(data_edTech_emos_neg[6, 5]))
+brand4_worried <- c(max, min, as.numeric(data_edTech_emos_neg[7, 5]))
+# brand5
+brand5_angry <- c(max, min, as.numeric(data_edTech_emos_neg[1, 6])) 
+brand5_anxious <- c(max, min, as.numeric(data_edTech_emos_neg[2, 6]))
+brand5_confused <- c(max, min, as.numeric(data_edTech_emos_neg[3, 6]))
+brand5_disappointed <- c(max, min, as.numeric(data_edTech_emos_neg[4, 6]))
+brand5_frustrated <- c(max, min, as.numeric(data_edTech_emos_neg[5, 6]))
+brand5_stressful <- c(max, min, as.numeric(data_edTech_emos_neg[6, 6]))
+brand5_worried <- c(max, min, as.numeric(data_edTech_emos_neg[7, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+# brand1
+brand1_radar_neg <- list(brand1_angry,
+                      brand1_anxious,
+                      brand1_confused,
+                      brand1_disappointed, 
+                      brand1_frustrated,
+                      brand1_stressful,
+                      brand1_worried)
+brand1_radar_neg <- as.data.frame(cbind(
+                      brand1_angry,
+                      brand1_anxious,
+                      brand1_confused,
+                      brand1_disappointed, 
+                      brand1_frustrated,
+                      brand1_stressful,
+                      brand1_worried))
+brand1_radar_neg
+# brand2
+brand2_radar_neg <- list(brand2_angry,
+                      brand2_anxious,
+                      brand2_confused,
+                      brand2_disappointed, 
+                      brand2_frustrated,
+                      brand2_stressful,
+                      brand2_worried)
+brand2_radar_neg <- as.data.frame(cbind(
+                      brand2_angry,
+                      brand2_anxious,
+                      brand2_confused,
+                      brand2_disappointed, 
+                      brand2_frustrated,
+                      brand2_stressful,
+                      brand2_worried))
+brand2_radar_neg
+# brand3
+brand3_radar_neg <- list(brand3_angry,
+                      brand3_anxious,
+                      brand3_confused,
+                      brand3_disappointed, 
+                      brand3_frustrated,
+                      brand3_stressful,
+                      brand3_worried)
+brand3_radar_neg <- as.data.frame(cbind(
+                      brand3_angry,
+                      brand3_anxious,
+                      brand3_confused,
+                      brand3_disappointed, 
+                      brand3_frustrated,
+                      brand3_stressful,
+                      brand3_worried))
+brand3_radar_neg
+# brand4
+brand4_radar_neg <- list(brand4_angry,
+                      brand4_anxious,
+                      brand4_confused,
+                      brand4_disappointed, 
+                      brand4_frustrated,
+                      brand4_stressful,
+                      brand4_worried)
+brand4_radar_neg <- as.data.frame(cbind(
+                      brand4_angry,
+                      brand4_anxious,
+                      brand4_confused,
+                      brand4_disappointed, 
+                      brand4_frustrated,
+                      brand4_stressful,
+                      brand4_worried))
+brand4_radar_neg
+# brand5
+brand5_radar_neg <- list(brand5_angry,
+                      brand5_anxious,
+                      brand5_confused,
+                      brand5_disappointed, 
+                      brand5_frustrated,
+                      brand5_stressful,
+                      brand5_worried)
+brand5_radar_neg <- as.data.frame(cbind(
+                      brand5_angry,
+                      brand5_anxious,
+                      brand5_confused,
+                      brand5_disappointed, 
+                      brand5_frustrated,
+                      brand5_stressful,
+                      brand5_worried))
+brand5_radar_neg
+
+# plot single ratings radar graphs
+# update column names
+emotions <- c("angry",
+              "anxious",
+              "confused",
+              "disappointed",
+              "frustrated",
+              "stressful",
+              "worried")
+colnames(brand1_radar_neg) <- c(emotions)
+colnames(brand2_radar_neg) <- c(emotions)
+colnames(brand3_radar_neg) <- c(emotions)
+colnames(brand4_radar_neg) <- c(emotions)
+colnames(brand5_radar_neg) <- c(emotions)
+
+# plot charts
+# brand1
+radarchart(brand1_radar_neg,
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = rgb(0.2, 0.5, 0.5, 0.9), # vector of colour codes for plot data
+           pfcol = rgb(0.2, 0.5, 0.5, 0.5), # vector of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What negative emotions are associated with Quizlet?"
+)
+# brand2
+radarchart(brand2_radar_neg,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.2, 0.5, 0.8, 0.9), 
+           pfcol = rgb(0.2, 0.5, 0.8, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with Duolingo?"
+)          
+# brand3
+radarchart(brand3_radar_neg,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.7, 0.5, 0.1, 0.9), 
+           pfcol = rgb(0.7, 0.5, 0.1, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with Forest?"
+)
+# brand4
+radarchart(brand4_radar_neg, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.8, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.8, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with StudySmarter?"
+)
+# brand5
+radarchart(brand5_radar_neg, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.5, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.5, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with GoodNotes?"
+)
+
+# create variables for multiple ratings radar graphs
+# create variables
+# angry
+angry <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[1, 2]), 
+  as.numeric(data_edTech_emos_neg[1, 3]), 
+  as.numeric(data_edTech_emos_neg[1, 4]), 
+  as.numeric(data_edTech_emos_neg[1, 5]),
+  as.numeric(data_edTech_emos_neg[1, 6]))
+# anxious
+anxious <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[2, 2]), 
+  as.numeric(data_edTech_emos_neg[2, 3]), 
+  as.numeric(data_edTech_emos_neg[2, 4]), 
+  as.numeric(data_edTech_emos_neg[2, 5]),
+  as.numeric(data_edTech_emos_neg[2, 6]))
+# confused
+confused <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[3, 2]), 
+  as.numeric(data_edTech_emos_neg[3, 3]), 
+  as.numeric(data_edTech_emos_neg[3, 4]), 
+  as.numeric(data_edTech_emos_neg[3, 5]),
+  as.numeric(data_edTech_emos_neg[3, 6]))
+# disappointed
+disappointed <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[4, 2]), 
+  as.numeric(data_edTech_emos_neg[4, 3]), 
+  as.numeric(data_edTech_emos_neg[4, 4]), 
+  as.numeric(data_edTech_emos_neg[4, 5]),
+  as.numeric(data_edTech_emos_neg[4, 6]))
+# frustrated
+frustrated <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[5, 2]), 
+  as.numeric(data_edTech_emos_neg[5, 3]), 
+  as.numeric(data_edTech_emos_neg[5, 4]), 
+  as.numeric(data_edTech_emos_neg[5, 5]),
+  as.numeric(data_edTech_emos_neg[5, 6]))
+# stressful
+stressful <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[6, 2]), 
+  as.numeric(data_edTech_emos_neg[6, 3]), 
+  as.numeric(data_edTech_emos_neg[6, 4]), 
+  as.numeric(data_edTech_emos_neg[6, 5]),
+  as.numeric(data_edTech_emos_neg[6, 6]))
+# worried
+worried <- c(
+  max, 
+  min, 
+  as.numeric(data_edTech_emos_neg[7, 2]), 
+  as.numeric(data_edTech_emos_neg[7, 3]), 
+  as.numeric(data_edTech_emos_neg[7, 4]), 
+  as.numeric(data_edTech_emos_neg[7, 5]),
+  as.numeric(data_edTech_emos_neg[7, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+allRadar_neg <- list(
+  angry, 
+  anxious, 
+  confused, 
+  disappointed, 
+  frustrated, 
+  stressful,
+  worried) 
+allRadar_neg <- as.data.frame(cbind(
+  angry, 
+  anxious, 
+  confused, 
+  disappointed, 
+  frustrated, 
+  stressful,
+  worried))
+allRadar_neg
+
+# pimp out radar chart
+colors_border = c(rgb(0.2, 0.5, 0.5, 0.9), 
+                  rgb(0.2, 0.5, 0.8, 0.9), 
+                  rgb(0.7, 0.5, 0.1, 0.9), 
+                  rgb(0.8, 0.2, 0.5, 0.9),
+                  rgb(0.5, 0.2, 0.5, 0.9)) # vector coded as var
+
+colors_in = c(rgb(0.2, 0.5, 0.5, 0.4), 
+              rgb(0.2, 0.5, 0.8, 0.4), 
+              rgb(0.7, 0.5, 0.1, 0.4), 
+              rgb(0.8, 0.2, 0.5, 0.4),
+              rgb(0.5, 0.2, 0.5, 0.4)) # vector coded as var
+
+radarchart(allRadar_neg,  
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = colors_border, # var of colour codes for plot data
+           pfcol = colors_in, # var of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           plty = 1, # vector of line types for plot data (repeatedly used)
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What negative emotions are associated with the 5 most popular EdTech brands?"
+)
+```
+
+Of the non-EdTech brands that are most popular, what kind of descriptive words or emotions are associated with them?
+- positive
+```{r}
+# brand1
+# select columns
+data_genTech_emos_pos_brand1 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_instagram_happy,
+                genBrands_emo_instagram_satisfied,
+                genBrands_emo_instagram_appreciated,
+                genBrands_emo_instagram_excited,
+                genBrands_emo_instagram_relieved,
+                genBrands_emo_instagram_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand1_count", 2:7)
+
+# change "count" column to numeric
+data_genTech_emos_pos_brand1$brand1_count <- as.numeric(data_genTech_emos_pos_brand1$brand1_count)
+
+# remove ID column
+data_genTech_emos_pos_brand1 <- data_genTech_emos_pos_brand1[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_pos_brand1 <- data_genTech_emos_pos_brand1 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "genBrands_emo_instagram_")))
+
+# brand2
+# select columns
+data_genTech_emos_pos_brand2 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_youtube_happy,
+                genBrands_emo_youtube_satisfied,
+                genBrands_emo_youtube_appreciated,
+                genBrands_emo_youtube_excited,
+                genBrands_emo_youtube_relieved,
+                genBrands_emo_youtube_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand2_count", 2:7)
+
+# change "count" column to numeric
+data_genTech_emos_pos_brand2$brand2_count <- as.numeric(data_genTech_emos_pos_brand2$brand2_count)
+
+# remove ID column
+data_genTech_emos_pos_brand2 <- data_genTech_emos_pos_brand2[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_pos_brand2 <- data_genTech_emos_pos_brand2 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "genBrands_emo_youtube_")))
+
+# brand3
+# select columns
+data_genTech_emos_pos_brand3 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_whatsapp_happy,
+                genBrands_emo_whatsapp_satisfied,
+                genBrands_emo_whatsapp_appreciated,
+                genBrands_emo_whatsapp_excited,
+                genBrands_emo_whatsapp_relieved,
+                genBrands_emo_whatsapp_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand3_count", 2:7)
+
+# change "count" column to numeric
+data_genTech_emos_pos_brand3$brand3_count <- as.numeric(data_genTech_emos_pos_brand3$brand3_count)
+
+# remove ID column
+data_genTech_emos_pos_brand3 <- data_genTech_emos_pos_brand3[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_pos_brand3 <- data_genTech_emos_pos_brand3 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "genBrands_emo_whatsapp_")))
+
+# brand4
+# select columns
+data_genTech_emos_pos_brand4 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_google_happy,
+                genBrands_emo_google_satisfied,
+                genBrands_emo_google_appreciated,
+                genBrands_emo_google_excited,
+                genBrands_emo_google_relieved,
+                genBrands_emo_google_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand4_count", 2:7)
+
+# change "count" column to numeric
+data_genTech_emos_pos_brand4$brand4_count <- as.numeric(data_genTech_emos_pos_brand4$brand4_count)
+
+# remove ID column
+data_genTech_emos_pos_brand4 <- data_genTech_emos_pos_brand4[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_pos_brand4 <- data_genTech_emos_pos_brand4 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "genBrands_emo_google_")))
+
+# brand5
+# select columns
+data_genTech_emos_pos_brand5 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_spotify_happy,
+                genBrands_emo_spotify_satisfied,
+                genBrands_emo_spotify_appreciated,
+                genBrands_emo_spotify_excited,
+                genBrands_emo_spotify_relieved,
+                genBrands_emo_spotify_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("pos_emotions", "brand5_count", 2:7)
+
+# change "count" column to numeric
+data_genTech_emos_pos_brand5$brand5_count <- as.numeric(data_genTech_emos_pos_brand5$brand5_count)
+
+# remove ID column
+data_genTech_emos_pos_brand5 <- data_genTech_emos_pos_brand5[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_pos_brand5 <- data_genTech_emos_pos_brand5 %>%
+  mutate(pos_emotions = as.character(stringr::str_remove(pos_emotions, "genBrands_emo_spotify_")))
+
+# join all dfs
+data_genTech_emos_pos <- merge(data_genTech_emos_pos_brand1, data_genTech_emos_pos_brand2, all.x = TRUE)
+data_genTech_emos_pos <- merge(data_genTech_emos_pos, data_genTech_emos_pos_brand3, all.x = TRUE)
+data_genTech_emos_pos <- merge(data_genTech_emos_pos, data_genTech_emos_pos_brand4, all.x = TRUE)
+data_genTech_emos_pos <- merge(data_genTech_emos_pos, data_genTech_emos_pos_brand5, all.x = TRUE)
+
+# prep for single radar graphs
+# check out data for reference
+data_genTech_emos_pos
+
+# set radar graph max, min, interval and individual values
+max <- 80
+min <- 0
+interval <- 20 # divide max into 4 intervals
+
+# create variables
+# brand1
+brand1_appreciated <- c(max, min, as.numeric(data_genTech_emos_pos[1, 2])) 
+brand1_confident <- c(max, min, as.numeric(data_genTech_emos_pos[2, 2]))
+brand1_excited <- c(max, min, as.numeric(data_genTech_emos_pos[3, 2]))
+brand1_happy <- c(max, min, as.numeric(data_genTech_emos_pos[4, 2]))
+brand1_relieved <- c(max, min, as.numeric(data_genTech_emos_pos[5, 2]))
+brand1_satisfied <- c(max, min, as.numeric(data_genTech_emos_pos[6, 2]))
+# brand2
+brand2_appreciated <- c(max, min, as.numeric(data_genTech_emos_pos[1, 3])) 
+brand2_confident <- c(max, min, as.numeric(data_genTech_emos_pos[2, 3]))
+brand2_excited <- c(max, min, as.numeric(data_genTech_emos_pos[3, 3]))
+brand2_happy <- c(max, min, as.numeric(data_genTech_emos_pos[4, 3]))
+brand2_relieved <- c(max, min, as.numeric(data_genTech_emos_pos[5, 3]))
+brand2_satisfied <- c(max, min, as.numeric(data_genTech_emos_pos[6, 3]))
+# brand3
+brand3_appreciated <- c(max, min, as.numeric(data_genTech_emos_pos[1, 4])) 
+brand3_confident <- c(max, min, as.numeric(data_genTech_emos_pos[2, 4]))
+brand3_excited <- c(max, min, as.numeric(data_genTech_emos_pos[3, 4]))
+brand3_happy <- c(max, min, as.numeric(data_genTech_emos_pos[4, 4]))
+brand3_relieved <- c(max, min, as.numeric(data_genTech_emos_pos[5, 4]))
+brand3_satisfied <- c(max, min, as.numeric(data_genTech_emos_pos[6, 4]))
+# brand4
+brand4_appreciated <- c(max, min, as.numeric(data_genTech_emos_pos[1, 5])) 
+brand4_confident <- c(max, min, as.numeric(data_genTech_emos_pos[2, 5]))
+brand4_excited <- c(max, min, as.numeric(data_genTech_emos_pos[3, 5]))
+brand4_happy <- c(max, min, as.numeric(data_genTech_emos_pos[4, 5]))
+brand4_relieved <- c(max, min, as.numeric(data_genTech_emos_pos[5, 5]))
+brand4_satisfied <- c(max, min, as.numeric(data_genTech_emos_pos[6, 5]))
+# brand5
+brand5_appreciated <- c(max, min, as.numeric(data_genTech_emos_pos[1, 6])) 
+brand5_confident <- c(max, min, as.numeric(data_genTech_emos_pos[2, 6]))
+brand5_excited <- c(max, min, as.numeric(data_genTech_emos_pos[3, 6]))
+brand5_happy <- c(max, min, as.numeric(data_genTech_emos_pos[4, 6]))
+brand5_relieved <- c(max, min, as.numeric(data_genTech_emos_pos[5, 6]))
+brand5_satisfied <- c(max, min, as.numeric(data_genTech_emos_pos[6, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+# brand1
+brand1_radar_pos <- list(brand1_appreciated,
+                      brand1_confident,
+                      brand1_excited,
+                      brand1_happy, 
+                      brand1_relieved,
+                      brand1_satisfied)
+brand1_radar_pos <- as.data.frame(cbind(
+                      brand1_appreciated,
+                      brand1_confident,
+                      brand1_excited,
+                      brand1_happy, 
+                      brand1_relieved,
+                      brand1_satisfied))
+brand1_radar_pos
+# brand2
+brand2_radar_pos <- list(brand2_appreciated,
+                      brand2_confident,
+                      brand2_excited,
+                      brand2_happy, 
+                      brand2_relieved,
+                      brand2_satisfied)
+brand2_radar_pos <- as.data.frame(cbind(
+                      brand2_appreciated,
+                      brand2_confident,
+                      brand2_excited,
+                      brand2_happy, 
+                      brand2_relieved,
+                      brand2_satisfied))
+brand2_radar_pos
+# brand3
+brand3_radar_pos <- list(brand3_appreciated,
+                      brand3_confident,
+                      brand3_excited,
+                      brand3_happy, 
+                      brand3_relieved,
+                      brand3_satisfied)
+brand3_radar_pos <- as.data.frame(cbind(
+                      brand3_appreciated,
+                      brand3_confident,
+                      brand3_excited,
+                      brand3_happy, 
+                      brand3_relieved,
+                      brand3_satisfied))
+brand3_radar_pos
+# brand4
+brand4_radar_pos <- list(brand4_appreciated,
+                      brand4_confident,
+                      brand4_excited,
+                      brand4_happy, 
+                      brand4_relieved,
+                      brand4_satisfied)
+brand4_radar_pos <- as.data.frame(cbind(
+                      brand4_appreciated,
+                      brand4_confident,
+                      brand4_excited,
+                      brand4_happy, 
+                      brand4_relieved,
+                      brand4_satisfied))
+brand4_radar_pos
+# brand5
+brand5_radar_pos <- list(brand5_appreciated,
+                      brand5_confident,
+                      brand5_excited,
+                      brand5_happy, 
+                      brand5_relieved,
+                      brand5_satisfied)
+brand5_radar_pos <- as.data.frame(cbind(
+                      brand5_appreciated,
+                      brand5_confident,
+                      brand5_excited,
+                      brand5_happy, 
+                      brand5_relieved,
+                      brand5_satisfied))
+brand5_radar_pos
+
+# plot single ratings radar graphs
+# update column names
+emotions <- c("appreciated",
+              "confident",
+              "excited",
+              "happy",
+              "relieved",
+              "satisfied")
+colnames(brand1_radar_pos) <- c(emotions)
+colnames(brand2_radar_pos) <- c(emotions)
+colnames(brand3_radar_pos) <- c(emotions)
+colnames(brand4_radar_pos) <- c(emotions)
+colnames(brand5_radar_pos) <- c(emotions)
+
+# plot charts
+# brand1
+radarchart(brand1_radar_pos,
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = rgb(0.2, 0.5, 0.5, 0.9), # vector of colour codes for plot data
+           pfcol = rgb(0.2, 0.5, 0.5, 0.5), # vector of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What positive emotions are associated with Quizlet?"
+)
+# brand2
+radarchart(brand2_radar_pos,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.2, 0.5, 0.8, 0.9), 
+           pfcol = rgb(0.2, 0.5, 0.8, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with Duolingo?"
+)          
+# brand3
+radarchart(brand3_radar_pos,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.7, 0.5, 0.1, 0.9), 
+           pfcol = rgb(0.7, 0.5, 0.1, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with Forest?"
+)
+# brand4
+radarchart(brand4_radar_pos, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.8, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.8, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with StudySmarter?"
+)
+# brand5
+radarchart(brand5_radar_pos, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.5, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.5, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What positive emotions are associated with GoodNotes?"
+)
+
+# create variables for multiple ratings radar graphs
+# create variables
+# appreciated
+appreciated <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[1, 2]), 
+  as.numeric(data_genTech_emos_pos[1, 3]), 
+  as.numeric(data_genTech_emos_pos[1, 4]), 
+  as.numeric(data_genTech_emos_pos[1, 5]),
+  as.numeric(data_genTech_emos_pos[1, 6]))
+# confident
+confident <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[2, 2]), 
+  as.numeric(data_genTech_emos_pos[2, 3]), 
+  as.numeric(data_genTech_emos_pos[2, 4]), 
+  as.numeric(data_genTech_emos_pos[2, 5]),
+  as.numeric(data_genTech_emos_pos[2, 6]))
+# excited
+excited <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[3, 2]), 
+  as.numeric(data_genTech_emos_pos[3, 3]), 
+  as.numeric(data_genTech_emos_pos[3, 4]), 
+  as.numeric(data_genTech_emos_pos[3, 5]),
+  as.numeric(data_genTech_emos_pos[3, 6]))
+# happy
+happy <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[4, 2]), 
+  as.numeric(data_genTech_emos_pos[4, 3]), 
+  as.numeric(data_genTech_emos_pos[4, 4]), 
+  as.numeric(data_genTech_emos_pos[4, 5]),
+  as.numeric(data_genTech_emos_pos[4, 6]))
+# relieved
+relieved <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[5, 2]), 
+  as.numeric(data_genTech_emos_pos[5, 3]), 
+  as.numeric(data_genTech_emos_pos[5, 4]), 
+  as.numeric(data_genTech_emos_pos[5, 5]),
+  as.numeric(data_genTech_emos_pos[5, 6]))
+# satisfied
+satisfied <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_pos[6, 2]), 
+  as.numeric(data_genTech_emos_pos[6, 3]), 
+  as.numeric(data_genTech_emos_pos[6, 4]), 
+  as.numeric(data_genTech_emos_pos[6, 5]),
+  as.numeric(data_genTech_emos_pos[6, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+allRadar_pos <- list(
+  appreciated, 
+  confident, 
+  excited, 
+  happy, 
+  relieved, 
+  satisfied) 
+allRadar_pos <- as.data.frame(cbind(
+  appreciated, 
+  confident, 
+  excited, 
+  happy, 
+  relieved, 
+  satisfied))
+allRadar_pos
+
+# pimp out radar chart
+colors_border = c(rgb(0.2, 0.5, 0.5, 0.9), 
+                  rgb(0.2, 0.5, 0.8, 0.9), 
+                  rgb(0.7, 0.5, 0.1, 0.9), 
+                  rgb(0.8, 0.2, 0.5, 0.9),
+                  rgb(0.5, 0.2, 0.5, 0.9)) # vector coded as var
+
+colors_in = c(rgb(0.2, 0.5, 0.5, 0.4), 
+              rgb(0.2, 0.5, 0.8, 0.4), 
+              rgb(0.7, 0.5, 0.1, 0.4), 
+              rgb(0.8, 0.2, 0.5, 0.4),
+              rgb(0.5, 0.2, 0.5, 0.4)) # vector coded as var
+
+radarchart(allRadar_pos,  
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = colors_border, # var of colour codes for plot data
+           pfcol = colors_in, # var of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           plty = 1, # vector of line types for plot data (repeatedly used)
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What positive emotions are associated with the 5 most popular EdTech brands?"
+)
+```
+
+Of the non-EdTech brands that are most popular, what kind of descriptive words or emotions are associated with them?
+- negative
+```{r}
+# brand1
+# select columns
+data_genTech_emos_neg_brand1 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_instagram_angry,
+                genBrands_emo_instagram_stressful,
+                genBrands_emo_instagram_disappointed,
+                genBrands_emo_instagram_frustrated,
+                genBrands_emo_instagram_worried,
+                genBrands_emo_instagram_anxious,
+                genBrands_emo_instagram_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand1_count", 2:8)
+
+# change "count" column to numeric
+data_genTech_emos_neg_brand1$brand1_count <- as.numeric(data_genTech_emos_neg_brand1$brand1_count)
+
+# remove ID column
+data_genTech_emos_neg_brand1 <- data_genTech_emos_neg_brand1[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_neg_brand1 <- data_genTech_emos_neg_brand1 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "genBrands_emo_instagram_")))
+
+# brand2
+# select columns
+data_genTech_emos_neg_brand2 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_youtube_angry,
+                genBrands_emo_youtube_stressful,
+                genBrands_emo_youtube_disappointed,
+                genBrands_emo_youtube_frustrated,
+                genBrands_emo_youtube_worried,
+                genBrands_emo_youtube_anxious,
+                genBrands_emo_youtube_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand2_count", 2:8)
+
+# change "count" column to numeric
+data_genTech_emos_neg_brand2$brand2_count <- as.numeric(data_genTech_emos_neg_brand2$brand2_count)
+
+# remove ID column
+data_genTech_emos_neg_brand2 <- data_genTech_emos_neg_brand2[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_neg_brand2 <- data_genTech_emos_neg_brand2 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "genBrands_emo_youtube_")))
+
+# brand3
+# select columns
+data_genTech_emos_neg_brand3 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_whatsapp_angry,
+                genBrands_emo_whatsapp_stressful,
+                genBrands_emo_whatsapp_disappointed,
+                genBrands_emo_whatsapp_frustrated,
+                genBrands_emo_whatsapp_worried,
+                genBrands_emo_whatsapp_anxious,
+                genBrands_emo_whatsapp_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand3_count", 2:8)
+
+# change "count" column to numeric
+data_genTech_emos_neg_brand3$brand3_count <- as.numeric(data_genTech_emos_neg_brand3$brand3_count)
+
+# remove ID column
+data_genTech_emos_neg_brand3 <- data_genTech_emos_neg_brand3[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_neg_brand3 <- data_genTech_emos_neg_brand3 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "genBrands_emo_whatsapp_")))
+
+# brand4
+# select columns
+data_genTech_emos_neg_brand4 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_google_angry,
+                genBrands_emo_google_stressful,
+                genBrands_emo_google_disappointed,
+                genBrands_emo_google_frustrated,
+                genBrands_emo_google_worried,
+                genBrands_emo_google_anxious,
+                genBrands_emo_google_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand4_count", 2:8)
+
+# change "count" column to numeric
+data_genTech_emos_neg_brand4$brand4_count <- as.numeric(data_genTech_emos_neg_brand4$brand4_count)
+
+# remove ID column
+data_genTech_emos_neg_brand4 <- data_genTech_emos_neg_brand4[, -c(1)]
+
+# remove "edBrands_emo_studysmarter_" from row names
+data_genTech_emos_neg_brand4 <- data_genTech_emos_neg_brand4 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "genBrands_emo_google_")))
+
+# brand5
+# select columns
+data_genTech_emos_neg_brand5 <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_spotify_angry,
+                genBrands_emo_spotify_stressful,
+                genBrands_emo_spotify_disappointed,
+                genBrands_emo_spotify_frustrated,
+                genBrands_emo_spotify_worried,
+                genBrands_emo_spotify_anxious,
+                genBrands_emo_spotify_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("neg_emotions", "brand5_count", 2:8)
+
+# change "count" column to numeric
+data_genTech_emos_neg_brand5$brand5_count <- as.numeric(data_genTech_emos_neg_brand5$brand5_count)
+
+# remove ID column
+data_genTech_emos_neg_brand5 <- data_genTech_emos_neg_brand5[, -c(1)]
+
+# remove "edBrands_emo_X_" from row names
+data_genTech_emos_neg_brand5 <- data_genTech_emos_neg_brand5 %>%
+  mutate(neg_emotions = as.character(stringr::str_remove(neg_emotions, "genBrands_emo_spotify_")))
+
+# join all dfs
+data_genTech_emos_neg <- merge(data_genTech_emos_neg_brand1, data_genTech_emos_neg_brand2, all.x = TRUE)
+data_genTech_emos_neg <- merge(data_genTech_emos_neg, data_genTech_emos_neg_brand3, all.x = TRUE)
+data_genTech_emos_neg <- merge(data_genTech_emos_neg, data_genTech_emos_neg_brand4, all.x = TRUE)
+data_genTech_emos_neg <- merge(data_genTech_emos_neg, data_genTech_emos_neg_brand5, all.x = TRUE)
+
+# radar graphs
+# check out data for reference
+data_genTech_emos_neg
+
+# set radar graph max, min, interval and individual values
+max <- 20
+min <- 0
+interval <-5 # divide max into 4 intervals
+
+# create variables
+# brand1
+brand1_angry <- c(max, min, as.numeric(data_genTech_emos_neg[1, 2])) 
+brand1_anxious <- c(max, min, as.numeric(data_genTech_emos_neg[2, 2]))
+brand1_confused <- c(max, min, as.numeric(data_genTech_emos_neg[3, 2]))
+brand1_disappointed <- c(max, min, as.numeric(data_genTech_emos_neg[4, 2]))
+brand1_frustrated <- c(max, min, as.numeric(data_genTech_emos_neg[5, 2]))
+brand1_stressful <- c(max, min, as.numeric(data_genTech_emos_neg[6, 2]))
+brand1_worried <- c(max, min, as.numeric(data_genTech_emos_neg[7, 2]))
+# brand2
+brand2_angry <- c(max, min, as.numeric(data_genTech_emos_neg[1, 3])) 
+brand2_anxious <- c(max, min, as.numeric(data_genTech_emos_neg[2, 3]))
+brand2_confused <- c(max, min, as.numeric(data_genTech_emos_neg[3, 3]))
+brand2_disappointed <- c(max, min, as.numeric(data_genTech_emos_neg[4, 3]))
+brand2_frustrated <- c(max, min, as.numeric(data_genTech_emos_neg[5, 3]))
+brand2_stressful <- c(max, min, as.numeric(data_genTech_emos_neg[6, 3]))
+brand2_worried <- c(max, min, as.numeric(data_genTech_emos_neg[7, 3]))
+# brand3
+brand3_angry <- c(max, min, as.numeric(data_genTech_emos_neg[1, 4])) 
+brand3_anxious <- c(max, min, as.numeric(data_genTech_emos_neg[2, 4]))
+brand3_confused <- c(max, min, as.numeric(data_genTech_emos_neg[3, 4]))
+brand3_disappointed <- c(max, min, as.numeric(data_genTech_emos_neg[4, 4]))
+brand3_frustrated <- c(max, min, as.numeric(data_genTech_emos_neg[5, 4]))
+brand3_stressful <- c(max, min, as.numeric(data_genTech_emos_neg[6, 4]))
+brand3_worried <- c(max, min, as.numeric(data_genTech_emos_neg[7, 4]))
+# brand4
+brand4_angry <- c(max, min, as.numeric(data_genTech_emos_neg[1, 5])) 
+brand4_anxious <- c(max, min, as.numeric(data_genTech_emos_neg[2, 5]))
+brand4_confused <- c(max, min, as.numeric(data_genTech_emos_neg[3, 5]))
+brand4_disappointed <- c(max, min, as.numeric(data_genTech_emos_neg[4, 5]))
+brand4_frustrated <- c(max, min, as.numeric(data_genTech_emos_neg[5, 5]))
+brand4_stressful <- c(max, min, as.numeric(data_genTech_emos_neg[6, 5]))
+brand4_worried <- c(max, min, as.numeric(data_genTech_emos_neg[7, 5]))
+# brand5
+brand5_angry <- c(max, min, as.numeric(data_genTech_emos_neg[1, 6])) 
+brand5_anxious <- c(max, min, as.numeric(data_genTech_emos_neg[2, 6]))
+brand5_confused <- c(max, min, as.numeric(data_genTech_emos_neg[3, 6]))
+brand5_disappointed <- c(max, min, as.numeric(data_genTech_emos_neg[4, 6]))
+brand5_frustrated <- c(max, min, as.numeric(data_genTech_emos_neg[5, 6]))
+brand5_stressful <- c(max, min, as.numeric(data_genTech_emos_neg[6, 6]))
+brand5_worried <- c(max, min, as.numeric(data_genTech_emos_neg[7, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+# brand1
+brand1_radar_neg <- list(brand1_angry,
+                      brand1_anxious,
+                      brand1_confused,
+                      brand1_disappointed, 
+                      brand1_frustrated,
+                      brand1_stressful,
+                      brand1_worried)
+brand1_radar_neg <- as.data.frame(cbind(
+                      brand1_angry,
+                      brand1_anxious,
+                      brand1_confused,
+                      brand1_disappointed, 
+                      brand1_frustrated,
+                      brand1_stressful,
+                      brand1_worried))
+brand1_radar_neg
+# brand2
+brand2_radar_neg <- list(brand2_angry,
+                      brand2_anxious,
+                      brand2_confused,
+                      brand2_disappointed, 
+                      brand2_frustrated,
+                      brand2_stressful,
+                      brand2_worried)
+brand2_radar_neg <- as.data.frame(cbind(
+                      brand2_angry,
+                      brand2_anxious,
+                      brand2_confused,
+                      brand2_disappointed, 
+                      brand2_frustrated,
+                      brand2_stressful,
+                      brand2_worried))
+brand2_radar_neg
+# brand3
+brand3_radar_neg <- list(brand3_angry,
+                      brand3_anxious,
+                      brand3_confused,
+                      brand3_disappointed, 
+                      brand3_frustrated,
+                      brand3_stressful,
+                      brand3_worried)
+brand3_radar_neg <- as.data.frame(cbind(
+                      brand3_angry,
+                      brand3_anxious,
+                      brand3_confused,
+                      brand3_disappointed, 
+                      brand3_frustrated,
+                      brand3_stressful,
+                      brand3_worried))
+brand3_radar_neg
+# brand4
+brand4_radar_neg <- list(brand4_angry,
+                      brand4_anxious,
+                      brand4_confused,
+                      brand4_disappointed, 
+                      brand4_frustrated,
+                      brand4_stressful,
+                      brand4_worried)
+brand4_radar_neg <- as.data.frame(cbind(
+                      brand4_angry,
+                      brand4_anxious,
+                      brand4_confused,
+                      brand4_disappointed, 
+                      brand4_frustrated,
+                      brand4_stressful,
+                      brand4_worried))
+brand4_radar_neg
+# brand5
+brand5_radar_neg <- list(brand5_angry,
+                      brand5_anxious,
+                      brand5_confused,
+                      brand5_disappointed, 
+                      brand5_frustrated,
+                      brand5_stressful,
+                      brand5_worried)
+brand5_radar_neg <- as.data.frame(cbind(
+                      brand5_angry,
+                      brand5_anxious,
+                      brand5_confused,
+                      brand5_disappointed, 
+                      brand5_frustrated,
+                      brand5_stressful,
+                      brand5_worried))
+brand5_radar_neg
+
+# plot single ratings radar graphs
+# update column names
+emotions <- c("angry",
+              "anxious",
+              "confused",
+              "disappointed",
+              "frustrated",
+              "stressful",
+              "worried")
+colnames(brand1_radar_neg) <- c(emotions)
+colnames(brand2_radar_neg) <- c(emotions)
+colnames(brand3_radar_neg) <- c(emotions)
+colnames(brand4_radar_neg) <- c(emotions)
+colnames(brand5_radar_neg) <- c(emotions)
+
+# plot charts
+# brand1
+radarchart(brand1_radar_neg,
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = rgb(0.2, 0.5, 0.5, 0.9), # vector of colour codes for plot data
+           pfcol = rgb(0.2, 0.5, 0.5, 0.5), # vector of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What negative emotions are associated with Quizlet?"
+)
+# brand2
+radarchart(brand2_radar_neg,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.2, 0.5, 0.8, 0.9), 
+           pfcol = rgb(0.2, 0.5, 0.8, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with Duolingo?"
+)          
+# brand3
+radarchart(brand3_radar_neg,
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.7, 0.5, 0.1, 0.9), 
+           pfcol = rgb(0.7, 0.5, 0.1, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with Forest?"
+)
+# brand4
+radarchart(brand4_radar_neg, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.8, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.8, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with StudySmarter?"
+)
+# brand5
+radarchart(brand5_radar_neg, 
+           #custom polygon
+           axistype = 1, 
+           pcol = rgb(0.5, 0.2, 0.5, 0.9), 
+           pfcol = rgb(0.5, 0.2, 0.5, 0.5), 
+           plwd = 2, 
+           #custom the grid
+           cglcol = "grey", 
+           cglty = 1, 
+           axislabcol = "grey", 
+           caxislabels = seq(min, max, interval), 
+           cglwd = 0.8, 
+           #custom labels
+           #vlcex = 0.8,
+           #title = "What negative emotions are associated with GoodNotes?"
+)
+
+# create variables for multiple ratings radar graphs
+# create variables
+# angry
+angry <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[1, 2]), 
+  as.numeric(data_genTech_emos_neg[1, 3]), 
+  as.numeric(data_genTech_emos_neg[1, 4]), 
+  as.numeric(data_genTech_emos_neg[1, 5]),
+  as.numeric(data_genTech_emos_neg[1, 6]))
+# anxious
+anxious <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[2, 2]), 
+  as.numeric(data_genTech_emos_neg[2, 3]), 
+  as.numeric(data_genTech_emos_neg[2, 4]), 
+  as.numeric(data_genTech_emos_neg[2, 5]),
+  as.numeric(data_genTech_emos_neg[2, 6]))
+# confused
+confused <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[3, 2]), 
+  as.numeric(data_genTech_emos_neg[3, 3]), 
+  as.numeric(data_genTech_emos_neg[3, 4]), 
+  as.numeric(data_genTech_emos_neg[3, 5]),
+  as.numeric(data_genTech_emos_neg[3, 6]))
+# disappointed
+disappointed <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[4, 2]), 
+  as.numeric(data_genTech_emos_neg[4, 3]), 
+  as.numeric(data_genTech_emos_neg[4, 4]), 
+  as.numeric(data_genTech_emos_neg[4, 5]),
+  as.numeric(data_genTech_emos_neg[4, 6]))
+# frustrated
+frustrated <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[5, 2]), 
+  as.numeric(data_genTech_emos_neg[5, 3]), 
+  as.numeric(data_genTech_emos_neg[5, 4]), 
+  as.numeric(data_genTech_emos_neg[5, 5]),
+  as.numeric(data_genTech_emos_neg[5, 6]))
+# stressful
+stressful <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[6, 2]), 
+  as.numeric(data_genTech_emos_neg[6, 3]), 
+  as.numeric(data_genTech_emos_neg[6, 4]), 
+  as.numeric(data_genTech_emos_neg[6, 5]),
+  as.numeric(data_genTech_emos_neg[6, 6]))
+# worried
+worried <- c(
+  max, 
+  min, 
+  as.numeric(data_genTech_emos_neg[7, 2]), 
+  as.numeric(data_genTech_emos_neg[7, 3]), 
+  as.numeric(data_genTech_emos_neg[7, 4]), 
+  as.numeric(data_genTech_emos_neg[7, 5]),
+  as.numeric(data_genTech_emos_neg[7, 6]))
+
+# create matrix using list() and cbind(), and turn into df
+allRadar_neg <- list(
+  angry, 
+  anxious, 
+  confused, 
+  disappointed, 
+  frustrated, 
+  stressful,
+  worried) 
+allRadar_neg <- as.data.frame(cbind(
+  angry, 
+  anxious, 
+  confused, 
+  disappointed, 
+  frustrated, 
+  stressful,
+  worried))
+allRadar_neg
+
+# pimp out radar chart
+colors_border = c(rgb(0.2, 0.5, 0.5, 0.9), 
+                  rgb(0.2, 0.5, 0.8, 0.9), 
+                  rgb(0.7, 0.5, 0.1, 0.9), 
+                  rgb(0.8, 0.2, 0.5, 0.9),
+                  rgb(0.5, 0.2, 0.5, 0.9)) # vector coded as var
+
+colors_in = c(rgb(0.2, 0.5, 0.5, 0.4), 
+              rgb(0.2, 0.5, 0.8, 0.4), 
+              rgb(0.7, 0.5, 0.1, 0.4), 
+              rgb(0.8, 0.2, 0.5, 0.4),
+              rgb(0.5, 0.2, 0.5, 0.4)) # vector coded as var
+
+radarchart(allRadar_neg,  
+           #custom polygon
+           axistype = 1, # centre axis label only
+           pcol = colors_border, # var of colour codes for plot data
+           pfcol = colors_in, # var of color codes for filling polygons
+           plwd = 2, # vector of line widths for plot data
+           plty = 1, # vector of line types for plot data (repeatedly used)
+           #custom the grid
+           cglcol = "grey", # Line color for radar grids
+           cglty = 1, # Line type for radar grids
+           axislabcol = "grey", # Line type for radar grids
+           caxislabels = seq(min, max, interval), # Character vector for center axis labels
+           cglwd = 0.8, # Line width for radar grids
+           #custom labels
+           #vlcex = 0.8, # Font size magnification for vlabels
+           #title = "What negative emotions are associated with the 5 most popular EdTech brands?"
+)
+```
+
+What trends can we identify according rate of EdTech brand engagement / app usage. e.g. for brands / apps that users use every other day or more, what emotions do they associate with them?
+- top 5 EdTech brands used every day
+```{r}
+# select columns
+data_edtech_brands_familiarity <- data %>%
+  dplyr::select(edBrands_familiar_quizlet,
+                 edBrands_familiar_repetico,
+                 edBrands_familiar_brainyoo,
+                 edBrands_familiar_studysmarter,
+                 edBrands_familiar_charlyEd,
+                 edBrands_familiar_foxit,
+                 edBrands_familiar_forest,
+                 edBrands_familiar_goconqr,
+                 edBrands_familiar_evernote,
+                 edBrands_familiar_notability,
+                 edBrands_familiar_goodnotes,
+                 edBrands_familiar_studydrive,
+                 edBrands_familiar_coursehero,
+                 edBrands_familiar_studocu,
+                 edBrands_familiar_duolingo) 
+
+# add in ID column
+data_edtech_brands_familiarity$ID <- seq.int(nrow(data_edtech_brands_familiarity))
+
+# move ID column to first column
+data_edtech_brands_familiarity <- data_edtech_brands_familiarity %>%
+  select(ID, everything())
+
+# filter last row (already counted totals)
+data_edtech_brands_familiarity <- data_edtech_brands_familiarity %>%
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# remove "genBrands_familiar_" from row names
+data_edtech_brands_familiarity <- data_edtech_brands_familiarity %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "edBrands_familiar_")))
+
+# change "count" column to numeric (double check)
+data_edtech_brands_familiarity$count <- as.numeric(data_edtech_brands_familiarity$count)
+
+ggplot(data_edtech_brands_familiarity, aes(x = reorder(brand, count), y = count, fill = brand)) +
+  geom_bar(stat = "identity") +
+  # remove fill legend 
+  theme(legend.position = "none") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite EdTech brands, which brands are used every other day?") +
+  # change x-axis title
+  xlab("brand")
+
+```
+
+- emotions associated with top 5 EdTech brands used every other day or more
+- EdTech positive
+```{r}
+# brand1
+# select columns
+data_edtech_brand1_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_duolingo_happy,
+                edBrands_emo_duolingo_satisfied,
+                edBrands_emo_duolingo_appreciated,
+                edBrands_emo_duolingo_excited,
+                edBrands_emo_duolingo_relieved,
+                edBrands_emo_duolingo_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand1_everyday_posEmos[cols] <- lapply(data_edtech_brand1_everyday_posEmos[cols], as.numeric)
+str(data_edtech_brand1_everyday_posEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand1_everyday_posEmos <- data_edtech_brand1_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_duolingo_")))
+
+# add column to distinguish brands
+data_edtech_brand1_everyday_posEmos$brand <- "duolingo"
+
+# brand2
+# select columns
+data_edtech_brand2_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_quizlet_happy,
+                edBrands_emo_quizlet_satisfied,
+                edBrands_emo_quizlet_appreciated,
+                edBrands_emo_quizlet_excited,
+                edBrands_emo_quizlet_relieved,
+                edBrands_emo_quizlet_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand2_everyday_posEmos[cols] <- lapply(data_edtech_brand2_everyday_posEmos[cols], as.numeric)
+str(data_edtech_brand2_everyday_posEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand2_everyday_posEmos <- data_edtech_brand2_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_quizlet_")))
+
+# add column to distinguish brands
+data_edtech_brand2_everyday_posEmos$brand <- "quizlet"
+
+# brand3
+# select columns
+data_edtech_brand3_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_goodnotes_happy,
+                edBrands_emo_goodnotes_satisfied,
+                edBrands_emo_goodnotes_appreciated,
+                edBrands_emo_goodnotes_excited,
+                edBrands_emo_goodnotes_relieved,
+                edBrands_emo_goodnotes_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand3_everyday_posEmos[cols] <- lapply(data_edtech_brand3_everyday_posEmos[cols], as.numeric)
+str(data_edtech_brand3_everyday_posEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand3_everyday_posEmos <- data_edtech_brand3_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_goodnotes_")))
+
+# add column to distinguish brands
+data_edtech_brand3_everyday_posEmos$brand <- "goodnotes"
+
+# brand4
+# select columns
+data_edtech_brand4_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_coursehero_happy,
+                edBrands_emo_coursehero_satisfied,
+                edBrands_emo_coursehero_appreciated,
+                edBrands_emo_coursehero_excited,
+                edBrands_emo_coursehero_relieved,
+                edBrands_emo_coursehero_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand4_everyday_posEmos[cols] <- lapply(data_edtech_brand4_everyday_posEmos[cols], as.numeric)
+str(data_edtech_brand4_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_edtech_brand4_everyday_posEmos <- data_edtech_brand4_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_coursehero_")))
+
+# add column to distinguish brands
+data_edtech_brand4_everyday_posEmos$brand <- "coursehero"
+
+# brand5
+# select columns
+data_edtech_brand5_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_forest_happy,
+                edBrands_emo_forest_satisfied,
+                edBrands_emo_forest_appreciated,
+                edBrands_emo_forest_excited,
+                edBrands_emo_forest_relieved,
+                edBrands_emo_forest_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric 
+cols <- 3
+data_edtech_brand5_everyday_posEmos[cols] <- lapply(data_edtech_brand5_everyday_posEmos[cols], as.numeric)
+str(data_edtech_brand5_everyday_posEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand5_everyday_posEmos <- data_edtech_brand5_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_forest_")))
+
+# add column to distinguish brands
+data_edtech_brand5_everyday_posEmos$brand <- "forest"
+
+# bind brand dfs together
+data_edtech_brands_everyday_posEmos <- dplyr::bind_rows(data_edtech_brand1_everyday_posEmos, 
+                                                      data_edtech_brand2_everyday_posEmos)
+data_edtech_brands_everyday_posEmos <- dplyr::bind_rows(data_edtech_brands_everyday_posEmos, 
+                                                      data_edtech_brand3_everyday_posEmos)
+data_edtech_brands_everyday_posEmos <- dplyr::bind_rows(data_edtech_brands_everyday_posEmos, 
+                                                      data_edtech_brand4_everyday_posEmos)
+data_edtech_brands_everyday_posEmos <- dplyr::bind_rows(data_edtech_brands_everyday_posEmos, 
+                                                      data_edtech_brand5_everyday_posEmos)
+
+# change "count" column to numeric (double check)
+data_edtech_brands_everyday_posEmos$count <- as.numeric(data_edtech_brands_everyday_posEmos$count)
+
+# plot stacked bar graph
+ggplot(data_edtech_brands_everyday_posEmos, 
+       aes(x = reorder(emotion, count),
+           y = count,
+           fill = brand)) +
+           #fill = factor(brand, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+           #position = "dodge") +
+           # change fill title to "question"
+           labs(fill = "EdTech brands") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite EdTech brands that are used every day, what emotions are associated with them?")
+  # change x-axis title
+  xlab("brand")
+
+```
+- EdTech negative
+```{r}
+# brand1
+# select columns
+data_edtech_brand1_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_duolingo_angry,
+                edBrands_emo_duolingo_stressful,
+                edBrands_emo_duolingo_disappointed,
+                edBrands_emo_duolingo_frustrated,
+                edBrands_emo_duolingo_worried,
+                edBrands_emo_duolingo_anxious,
+                edBrands_emo_duolingo_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand1_everyday_negEmos[cols] <- lapply(data_edtech_brand1_everyday_negEmos[cols], as.numeric)
+str(data_edtech_brand1_everyday_negEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand1_everyday_negEmos <- data_edtech_brand1_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_duolingo_")))
+
+# add column to distinguish brands
+data_edtech_brand1_everyday_negEmos$brand <- "duolingo"
+
+# brand2
+# select columns
+data_edtech_brand2_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_quizlet_angry,
+                edBrands_emo_quizlet_stressful,
+                edBrands_emo_quizlet_disappointed,
+                edBrands_emo_quizlet_frustrated,
+                edBrands_emo_quizlet_worried,
+                edBrands_emo_quizlet_anxious,
+                edBrands_emo_quizlet_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand2_everyday_negEmos[cols] <- lapply(data_edtech_brand2_everyday_negEmos[cols], as.numeric)
+str(data_edtech_brand2_everyday_negEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand2_everyday_negEmos <- data_edtech_brand2_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_quizlet_")))
+
+# add column to distinguish brands
+data_edtech_brand2_everyday_negEmos$brand <- "quizlet"
+
+# brand3
+# select columns
+data_edtech_brand3_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_goodnotes_angry,
+                edBrands_emo_goodnotes_stressful,
+                edBrands_emo_goodnotes_disappointed,
+                edBrands_emo_goodnotes_frustrated,
+                edBrands_emo_goodnotes_worried,
+                edBrands_emo_goodnotes_anxious,
+                edBrands_emo_goodnotes_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand3_everyday_negEmos[cols] <- lapply(data_edtech_brand3_everyday_negEmos[cols], as.numeric)
+str(data_edtech_brand3_everyday_negEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand3_everyday_negEmos <- data_edtech_brand3_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_goodnotes_")))
+
+# add column to distinguish brands
+data_edtech_brand3_everyday_negEmos$brand <- "goodnotes"
+
+# brand4
+# select columns
+data_edtech_brand4_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_coursehero_angry,
+                edBrands_emo_coursehero_stressful,
+                edBrands_emo_coursehero_disappointed,
+                edBrands_emo_coursehero_frustrated,
+                edBrands_emo_coursehero_worried,
+                edBrands_emo_coursehero_anxious,
+                edBrands_emo_coursehero_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_edtech_brand4_everyday_negEmos[cols] <- lapply(data_edtech_brand4_everyday_negEmos[cols], as.numeric)
+str(data_edtech_brand4_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_edtech_brand4_everyday_negEmos <- data_edtech_brand4_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_coursehero_")))
+
+# add column to distinguish brands
+data_edtech_brand4_everyday_negEmos$brand <- "coursehero"
+
+# brand5
+# select columns
+data_edtech_brand5_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                edBrands_emo_forest_angry,
+                edBrands_emo_forest_stressful,
+                edBrands_emo_forest_disappointed,
+                edBrands_emo_forest_frustrated,
+                edBrands_emo_forest_worried,
+                edBrands_emo_forest_anxious,
+                edBrands_emo_forest_confused) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric 
+cols <- 3
+data_edtech_brand5_everyday_negEmos[cols] <- lapply(data_edtech_brand5_everyday_negEmos[cols], as.numeric)
+str(data_edtech_brand5_everyday_negEmos)
+
+# remove "edBrands_emo_X_" from row names
+data_edtech_brand5_everyday_negEmos <- data_edtech_brand5_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "edBrands_emo_forest_")))
+
+# add column to distinguish brands
+data_edtech_brand5_everyday_negEmos$brand <- "forest"
+
+# bind brand dfs together
+data_edtech_brands_everyday_negEmos <- dplyr::bind_rows(data_edtech_brand1_everyday_negEmos, 
+                                                      data_edtech_brand2_everyday_negEmos)
+data_edtech_brands_everyday_negEmos <- dplyr::bind_rows(data_edtech_brands_everyday_negEmos, 
+                                                      data_edtech_brand3_everyday_negEmos)
+data_edtech_brands_everyday_negEmos <- dplyr::bind_rows(data_edtech_brands_everyday_negEmos, 
+                                                      data_edtech_brand4_everyday_negEmos)
+data_edtech_brands_everyday_negEmos <- dplyr::bind_rows(data_edtech_brands_everyday_negEmos, 
+                                                      data_edtech_brand5_everyday_negEmos)
+
+# change "count" column to numeric (double check)
+data_edtech_brands_everyday_negEmos$count <- as.numeric(data_edtech_brands_everyday_negEmos$count)
+
+# plot stacked bar graph
+ggplot(data_edtech_brands_everyday_negEmos, 
+       aes(x = reorder(emotion, count),
+           y = count,
+           fill = brand)) +
+           #fill = factor(brand, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+           #position = "dodge") +
+           # change fill title to "question"
+           labs(fill = "EdTech brands") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite EdTech brands that are used every day, what emotions are associated with them?")
+  # change x-axis title
+  xlab("brand")
+
+```
+
+What trends can we identify according rate of brand engagement / app usage. e.g. for brands / apps that users use every other day or more, what emotions do they associate with them?
+- top 5 non-EdTech brands used every day
+```{r}
+# select columns
+data_general_brands_familiarity <- data %>%
+  dplyr::select(genBrands_familiar_mcdonalds,
+                genBrands_familiar_bereal,
+                genBrands_familiar_vinted,
+                genBrands_familiar_whatsapp,
+                genBrands_familiar_hipal,
+                genBrands_familiar_tiktok,
+                genBrands_familiar_google,
+                genBrands_familiar_disney,
+                genBrands_familiar_instagram,
+                genBrands_familiar_youtube,
+                genBrands_familiar_snapchat,
+                genBrands_familiar_facebook,
+                genBrands_familiar_spotify,
+                genBrands_familiar_messenger,
+                genBrands_familiar_telegram) 
+
+# add in ID column
+data_general_brands_familiarity$ID <- seq.int(nrow(data_general_brands_familiarity))
+
+# move ID column to first column
+data_general_brands_familiarity <- data_general_brands_familiarity %>%
+  select(ID, everything())
+
+# filter last row (already counted totals)
+data_general_brands_familiarity <- data_general_brands_familiarity %>%
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("brand", "count", 2:16)
+
+# remove "genBrands_familiar_" from row names
+data_general_brands_familiarity <- data_general_brands_familiarity %>%
+  mutate(brand = as.character(stringr::str_remove(brand, "genBrands_familiar_")))
+
+# change "count" column to numeric (double check)
+data_general_brands_familiarity$count <- as.numeric(data_general_brands_familiarity$count)
+
+ggplot(data_general_brands_familiarity, aes(x = reorder(brand, count), y = count, fill = brand)) +
+  geom_bar(stat = "identity") +
+  # remove fill legend 
+  theme(legend.position = "none") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite non-EdTech brands, which brands are used every day?") +
+  # change x-axis title
+  xlab("brand")
+
+```
+
+- emotions associated with top 5 non-EdTech brands used every other day or more
+- non-EdTech positive
+```{r}
+# brand1
+# select columns
+data_general_brand1_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_youtube_happy,
+                genBrands_emo_youtube_satisfied,
+                genBrands_emo_youtube_appreciated,
+                genBrands_emo_youtube_excited,
+                genBrands_emo_youtube_relieved,
+                genBrands_emo_youtube_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_general_brand1_everyday_posEmos[cols] <- lapply(data_general_brand1_everyday_posEmos[cols], as.numeric)
+str(data_general_brand1_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand1_everyday_posEmos <- data_general_brand1_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_youtube_")))
+
+# add column to distinguish brands
+data_general_brand1_everyday_posEmos$brand <- "youtube"
+
+# brand2
+# select columns
+data_general_brand2_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_instagram_happy,
+                genBrands_emo_instagram_satisfied,
+                genBrands_emo_instagram_appreciated,
+                genBrands_emo_instagram_excited,
+                genBrands_emo_instagram_relieved,
+                genBrands_emo_instagram_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_general_brand2_everyday_posEmos[cols] <- lapply(data_general_brand2_everyday_posEmos[cols], as.numeric)
+str(data_general_brand2_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand2_everyday_posEmos <- data_general_brand2_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_instagram_")))
+
+# add column to distinguish brands
+data_general_brand2_everyday_posEmos$brand <- "instagram"
+
+# brand3
+# select columns
+data_general_brand3_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_whatsapp_happy,
+                genBrands_emo_whatsapp_satisfied,
+                genBrands_emo_whatsapp_appreciated,
+                genBrands_emo_whatsapp_excited,
+                genBrands_emo_whatsapp_relieved,
+                genBrands_emo_whatsapp_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_general_brand3_everyday_posEmos[cols] <- lapply(data_general_brand3_everyday_posEmos[cols], as.numeric)
+str(data_general_brand3_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand3_everyday_posEmos <- data_general_brand3_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_whatsapp_")))
+
+# add column to distinguish brands
+data_general_brand3_everyday_posEmos$brand <- "whatsapp"
+
+# brand4
+# select columns
+data_general_brand4_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_google_happy,
+                genBrands_emo_google_satisfied,
+                genBrands_emo_google_appreciated,
+                genBrands_emo_google_excited,
+                genBrands_emo_google_relieved,
+                genBrands_emo_google_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric
+cols <- 3
+data_general_brand4_everyday_posEmos[cols] <- lapply(data_general_brand4_everyday_posEmos[cols], as.numeric)
+str(data_general_brand4_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand4_everyday_posEmos <- data_general_brand4_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_google_")))
+
+# add column to distinguish brands
+data_general_brand4_everyday_posEmos$brand <- "google"
+
+# brand5
+# select columns
+data_general_brand5_everyday_posEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_spotify_happy,
+                genBrands_emo_spotify_satisfied,
+                genBrands_emo_spotify_appreciated,
+                genBrands_emo_spotify_excited,
+                genBrands_emo_spotify_relieved,
+                genBrands_emo_spotify_confident) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:7)
+
+# change count column to numeric 
+cols <- 3
+data_general_brand5_everyday_posEmos[cols] <- lapply(data_general_brand5_everyday_posEmos[cols], as.numeric)
+str(data_general_brand5_everyday_posEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand5_everyday_posEmos <- data_general_brand5_everyday_posEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_spotify_")))
+
+# add column to distinguish brands
+data_general_brand5_everyday_posEmos$brand <- "spotify"
+
+# bind brand dfs together
+data_general_brands_everyday_posEmos <- dplyr::bind_rows(data_general_brand1_everyday_posEmos, 
+                                                      data_general_brand2_everyday_posEmos)
+data_general_brands_everyday_posEmos <- dplyr::bind_rows(data_general_brands_everyday_posEmos, 
+                                                      data_general_brand3_everyday_posEmos)
+data_general_brands_everyday_posEmos <- dplyr::bind_rows(data_general_brands_everyday_posEmos, 
+                                                      data_general_brand4_everyday_posEmos)
+data_general_brands_everyday_posEmos <- dplyr::bind_rows(data_general_brands_everyday_posEmos, 
+                                                      data_general_brand5_everyday_posEmos)
+
+# change "count" column to numeric (double check)
+data_general_brands_everyday_posEmos$count <- as.numeric(data_general_brands_everyday_posEmos$count)
+
+# plot stacked bar graph
+ggplot(data_general_brands_everyday_posEmos, 
+       aes(x = reorder(emotion, count),
+           y = count,
+           fill = brand)) +
+           #fill = factor(brand, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+           #position = "dodge") +
+  # change fill title to "question"
+  labs(fill = "non-EdTech brands") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite non-EdTech brands that are used every day, what emotions are associated with them?")
+  # change x-axis title
+  xlab("brand")
+
+```
+
+- non-EdTech negative
+```{r}
+# brand1
+# select columns
+data_general_brand1_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_youtube_angry,
+                genBrands_emo_youtube_anxious,
+                genBrands_emo_youtube_confused,
+                genBrands_emo_youtube_disappointed,
+                genBrands_emo_youtube_frustrated,
+                genBrands_emo_youtube_stressful,
+                genBrands_emo_youtube_worried) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_general_brand1_everyday_negEmos[cols] <- lapply(data_general_brand1_everyday_negEmos[cols], as.numeric)
+str(data_general_brand1_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand1_everyday_negEmos <- data_general_brand1_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_youtube_")))
+
+# add column to distinguish brands
+data_general_brand1_everyday_negEmos$brand <- "youtube"
+
+# brand2
+# select columns
+data_general_brand2_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_instagram_angry,
+                genBrands_emo_instagram_anxious,
+                genBrands_emo_instagram_confused,
+                genBrands_emo_instagram_disappointed,
+                genBrands_emo_instagram_frustrated,
+                genBrands_emo_instagram_stressful,
+                genBrands_emo_instagram_worried) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_general_brand2_everyday_negEmos[cols] <- lapply(data_general_brand2_everyday_negEmos[cols], as.numeric)
+str(data_general_brand2_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand2_everyday_negEmos <- data_general_brand2_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_instagram_")))
+
+# add column to distinguish brands
+data_general_brand2_everyday_negEmos$brand <- "instagram"
+
+# brand3
+# select columns
+data_general_brand3_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_whatsapp_angry,
+                genBrands_emo_whatsapp_anxious,
+                genBrands_emo_whatsapp_confused,
+                genBrands_emo_whatsapp_disappointed,
+                genBrands_emo_whatsapp_frustrated,
+                genBrands_emo_whatsapp_stressful,
+                genBrands_emo_whatsapp_worried) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_general_brand3_everyday_negEmos[cols] <- lapply(data_general_brand3_everyday_negEmos[cols], as.numeric)
+str(data_general_brand3_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand3_everyday_negEmos <- data_general_brand3_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_whatsapp_")))
+
+# add column to distinguish brands
+data_general_brand3_everyday_negEmos$brand <- "whatsapp"
+
+# brand4
+# select columns
+data_general_brand4_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_google_angry,
+                genBrands_emo_google_anxious,
+                genBrands_emo_google_confused,
+                genBrands_emo_google_disappointed,
+                genBrands_emo_google_frustrated,
+                genBrands_emo_google_stressful,
+                genBrands_emo_google_worried) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric
+cols <- 3
+data_general_brand4_everyday_negEmos[cols] <- lapply(data_general_brand4_everyday_negEmos[cols], as.numeric)
+str(data_general_brand4_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand4_everyday_negEmos <- data_general_brand4_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_google_")))
+
+# add column to distinguish brands
+data_general_brand4_everyday_negEmos$brand <- "google"
+
+# brand5
+# select columns
+data_general_brand5_everyday_negEmos <- data %>%
+  dplyr::select(ID,
+                genBrands_emo_spotify_angry,
+                genBrands_emo_spotify_anxious,
+                genBrands_emo_spotify_confused,
+                genBrands_emo_spotify_disappointed,
+                genBrands_emo_spotify_frustrated,
+                genBrands_emo_spotify_stressful,
+                genBrands_emo_spotify_worried) %>%
+  # filter last row (already counted totals)
+  filter(ID == 286) %>%
+  # gather columns into rows
+  gather("emotion", "count", 2:8)
+
+# change count column to numeric 
+cols <- 3
+data_general_brand5_everyday_negEmos[cols] <- lapply(data_general_brand5_everyday_negEmos[cols], as.numeric)
+str(data_general_brand5_everyday_negEmos)
+
+# remove "genBrands_emo_X_" from row names
+data_general_brand5_everyday_negEmos <- data_general_brand5_everyday_negEmos %>%
+  mutate(emotion = as.character(stringr::str_remove(emotion, "genBrands_emo_spotify_")))
+
+# add column to distinguish brands
+data_general_brand5_everyday_negEmos$brand <- "spotify"
+
+# bind brand dfs together
+data_general_brands_everyday_negEmos <- dplyr::bind_rows(data_general_brand1_everyday_negEmos, 
+                                                      data_general_brand2_everyday_negEmos)
+data_general_brands_everyday_negEmos <- dplyr::bind_rows(data_general_brands_everyday_negEmos, 
+                                                      data_general_brand3_everyday_negEmos)
+data_general_brands_everyday_negEmos <- dplyr::bind_rows(data_general_brands_everyday_negEmos, 
+                                                      data_general_brand4_everyday_negEmos)
+data_general_brands_everyday_negEmos <- dplyr::bind_rows(data_general_brands_everyday_negEmos, 
+                                                      data_general_brand5_everyday_negEmos)
+
+# change "count" column to numeric (double check)
+data_general_brands_everyday_negEmos$count <- as.numeric(data_general_brands_everyday_negEmos$count)
+
+# plot stacked bar graph
+ggplot(data_general_brands_everyday_negEmos, 
+       aes(x = reorder(emotion, count),
+           y = count,
+           fill = brand)) +
+           #fill = factor(brand, levels = c("favourites", "awareness")))) +
+  geom_bar(stat = "identity",
+           position = "stack") +
+           #position = "dodge") +
+  # change fill title to "question"
+  labs(fill = "non-EdTech brands") +
+  # change angle of labels on x-axis
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  # add title
+  #ggtitle("From the selected favourite non-EdTech brands that are used every day, what emotions are associated with them?")
+  # change x-axis title
+  xlab("brand")
+
+```
