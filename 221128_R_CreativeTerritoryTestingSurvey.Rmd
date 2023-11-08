@@ -53,7 +53,7 @@ Get and set working directory
 getwd()
 
 # set working directory
-setwd("/Users/alison/Documents/R_scripts")
+setwd("/Users/xxx")
 getwd()
 ```
 
